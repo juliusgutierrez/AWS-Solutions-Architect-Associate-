@@ -90,6 +90,35 @@ ___
   - Ensure you have the available capacity in a specific AZ for any duration
   - No time commitment, no billing discount
   - You're charged at On-demand rate whether you run instances or not
+  
+### Spot Instances
+- Spot Requests
+  - <b>One-time</b>: Request once opened, spins up the spot instances and the request closes.
+  - <b>Persistent</b>:
+    - Request will stay disabled while the spot instances are up and running
+    - It becomes acive after the spot instance is interrupted.
+    - If you stop the spot instance, the requet will become active only afer you start the spot instance.
+  - You can only cancel spot instance request that are open, active, or disabled.
+  - Cancelling a Spot Request doest not terminate instances. you must first cancel a Spot Request, and then terminate the associated Spot Instances.
+- Spot Fleets
+  - Combination of spot and on-demand instances(optional) that tries to optimize for cost or capacity
+  - Launch Templates must be used to have on demand instances in the fleet
+  - Can consist of instances of different classes
+  - Strategies to allocate Spot Instances:
+    - lowestPrices : from the pool with lowest price (cost, optimization, short workload)
+    - diversified: distributed across all pools(great for availability, long workloads)
+    - capacityOptimized: pool with the optimal capacity for the number of instances.
+## Elastic IP
+- Static public IP that you own as long as you don't delete it
+- Can be attached to an EC2 Instance(even when it is stopped)
+- Soft limit of 5 elastic IPs per account
+- Doesn't incur charges as long as the following conditions are met
+  - is associated with an Amazon EC2 instance
+  - instance associated with the elastic IP is running
+  - the instance has only one Elastic IP attached to it
+
+## Placement Groups
+- 
 ___
 
 ## Storage
