@@ -187,6 +187,38 @@ ___
 
 > When the new AMI is copied from region A into region B, it automatically creates a snapshot in region B because AMIs are based on the underlying snapshots.
 
+### Instance Metadata
+- URL to fetch metadata about the instance (http://169.254.169.254/latest/meta-data)
+- This URL is internal to AWS and can only be hit from the instance
+
+### EC2 Classic & ClassicLink
+- Instances run in single network shared with other customers(this is how AWS started)
+- <b>ClassicLink</b> allow you to link EC2-Classic instances to a VPC in your account
+
+### Billing
+- Reserved instances will be billed regardless of their state (billed for a reservation period)
+- On-demand instances in `stopping` state when preparing to hibernate will be billed
+- If an instance is running, it will be billed
+- In all the other cases, an instance will not be billed
+
+### Run Command
+- System Manager <b>Run command</b> lets you remotely and securely manage the configuration of your managed instances. A managed instance is any EC2 instance that has been configured for <b> Systems Manager </b>
+- Run command enables you to <b>automate common administrative tasks</b> and perform ad-hoc configuration changes at scale.
+- You can use Run Command from the <b>AWS Console,</b> the AWS CLI, Tools for windows, powershell or AWS SDKs. Run command is offered at no additional cost.
+
+### Instance Tenancy
+- Default: Instance runs on shared hardware
+- Dedicated: Instance runs on single-tenant hardware
+- Host: Instance runs on dedicated host  
+> - Tenancy of an instance can only be change from host to dedicated or dedicated to host after the instance has been launched
+> - Dedicated instance tenancy takes precedence over default instance tenancy
+
+### Troubleshooting
+- The following are a few reason why instance might immediately terminate:
+  - Reached the limit of EBS volume
+  - EBS snapshot is corrupt
+  - Root EBS volume is encrypted and you do not have permissions to access on the KMS key for decryption.
+  - Instance store-backed AMI that you used to launch the instance is missing a required part
 ___
 
 ## Storage
