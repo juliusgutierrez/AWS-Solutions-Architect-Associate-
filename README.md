@@ -118,7 +118,75 @@ ___
   - the instance has only one Elastic IP attached to it
 
 ## Placement Groups
-- 
+- Cluster Placement Group (optimize for network)
+  - All the instances are placed on the same hardware (same rack)
+  - Pros: Great network(10 Gbps bandwidth between instances)
+  - Cons: If the rack fails, all instances will fail at the same time
+  - Used in HPC (minimize inter-node latency & maximize throughput)
+- Spread Placement Group (maximize availability)
+  - Each instance is in a separate rack (physical hardware) inside an AZ
+  - Supports Multi AZ
+  - Up to 7 instances per AZ per placement group (ex. for 15 instances, need 3 AZ)
+  - Used for critical applications with need to high availability
+- Partition Placement Group (balance of performance and availability)
+  - Instances in a partition share rack with each other
+  - If the rack goes down, the entire partition goes down
+  - Up to 7 partitions per AZ
+  - Used in <b>Big Data</b> applications (Hadoop, HDFS, HBase, Kafka, Cassandra)
+ 
+> If you received a capacity error when launching an instance in a placement group that already has running instances, stop and start all of the instances in the placement group, and try the launch again. 
+> Restarting the instances may migrate them to hardware that has a capacity for all the requested instances.
+  
+### Elastic Network Interfaces (ENI)
+- ENI is a virtual network card that <b>gives a private IP to an EC2 instance </b>
+- A primary ENI is created and attached to the instance upon creation and will be deleted automatically upon instance terminatio.
+- We can create additional ENIs and attach them to an EC2 instance to access it via multiple private IPs.
+- We can detach & attach ENIs across instances
+- ENIs are tied to the subnet hence to the AZ
+
+### EC2 Instance States
+- Stop
+  - EBS root volume is preserved
+- Terminate
+  - EBS root volume is destroyed
+- Hibernate
+  - Hibernate save the contents from the instance memory(RAM) to the EBS root volume
+  - EBS root volumne is preserved
+  - The instance boots much faster as the OS is not stopped and restarted
+  - When you start your instance:
+    - EBS root volume is restored to its previous state
+    - RAM contents are reloaded
+    - Processes that were previously running on the instance are resumed
+    - Previously attached data volumes are reattached and the instance retain its instance ID
+  - Should be used for application that take a long time to start
+  - <b>Not supported for Spot Instance </b>
+  - Max hibernation duration = <b>60 days</b>
+- Standby
+  - Instance remains attached to the ASG but is temporarily put out of service(the ASG doesn't replace this instance)
+  - Used to install updates or troubleshoot a running instance.
+
+### EC2 Nitro
+- Newer virtualization technology for EC2 Instances
+- Better networking options (enhanced networking, HPC, IPv6)
+- Higher speed EBS (64,000 EBS input/output operation per seconds (IOPS) max on Nitro instances whereas 32,000 on non-nitro)
+- Better underlying security
+
+### vCPU & Threads
+- vCPU is the total number of concurrent threads that can be run on an EC2 instance
+- Usually 2 threads per CPU core (eg 4CPU cores -> 8vCPU)
+
+### Amazon Machine Image (AMI)
+- AMIs are the image of the instance after installing all the necessary OS, software and configure everything
+- it boots much faster because the whole thing is pre-packaged and doesnt have to be installed separately for each instance.
+- Good for static configurations
+- <b>Bound to a region</b> and can be copied across regions
+- You can launch EC2 instances from:
+  - A public AMI: AWS provided
+  - Your own AMI: you make and maintain them yourself
+  - An AWS Marketplace AMI: an AMI someone eles made(and potentially sells)
+
+> When the new AMI is copied from region A into region B, it automatically creates a snapshot in region B because AMIs are based on the underlying snapshots.
+
 ___
 
 ## Storage
