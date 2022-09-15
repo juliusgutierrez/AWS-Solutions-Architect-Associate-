@@ -1,9 +1,9 @@
 # AWS-Solutions-Architect-Associate (C00-003)
 ___
 
-## Computing
+# Computing
 
-### Elastic Compute Cloud (EC2)
+## Elastic Compute Cloud (EC2)
 - Regional Service
 - EC2 (Elastic Compote Cloud) is an Infrastructure as a Service
 - Stop & Start of an instance may change its public IP but not its private IP
@@ -108,7 +108,7 @@ ___
     - lowestPrices : from the pool with lowest price (cost, optimization, short workload)
     - diversified: distributed across all pools(great for availability, long workloads)
     - capacityOptimized: pool with the optimal capacity for the number of instances.
-## Elastic IP
+### Elastic IP
 - Static public IP that you own as long as you don't delete it
 - Can be attached to an EC2 Instance(even when it is stopped)
 - Soft limit of 5 elastic IPs per account
@@ -117,7 +117,7 @@ ___
   - instance associated with the elastic IP is running
   - the instance has only one Elastic IP attached to it
 
-## Placement Groups
+### Placement Groups
 - Cluster Placement Group (optimize for network)
   - All the instances are placed on the same hardware (same rack)
   - Pros: Great network(10 Gbps bandwidth between instances)
@@ -219,9 +219,115 @@ ___
   - EBS snapshot is corrupt
   - Root EBS volume is encrypted and you do not have permissions to access on the KMS key for decryption.
   - Instance store-backed AMI that you used to launch the instance is missing a required part
+
+## Elastic Load Balancer (ELB)
+- Regional Service
+- Support Multi AZ
+- Spread load across multiple EC2 Instances
+- Separate public tracfic from private traffic
+- Health check allow ELB to know which instances are working properly (done on port and a route, `/health` is common)
+- <b>Does not support weighted routing</b>
+> if no targets are associated with the target groups -> 503 Service Unavailable
+> Using ALB & NLB, instances in peered VPCs can be used as targets using IP Addresses.
+
+### Types
+<b>Classic Load Balancer (CLB) - deprecated</b>
+- Load balancing to a single application
+- Supports HTTP, HTTPS (layer 7) & TCP, SL (layer 3)
+- Provides a fixed hostnames (`xxx.region.elb.amazonaws.com`)
+
+<b>Application Load Balancer (ALB) </b>
+- Load balancing to multiple applications(target groups)
+- Operates at Layer 7 (HTTP, HTTPS and WebSocket)
+- Provides a fixed hostname (`xxx.region.elb.amazonaws.com`)
+- ALB terminates the upstream connection and creates a new downstream connection to the targets(connection termination)
+- <b>Security Groups can be attached to ALBs</b> to filter requests
+- Great for micro services & container-based applications (Docker & ECS)
+- Client info is passed in the request headers
+  - Client IP -> `X-Forwarded-For`
+  - Client Port -> `X-Forwarded-Port`
+  - Protocol -> `X-Forwarded-Proto`
+- Target Groups
+  - Health checks are done at the target group level
+  - Target Groups could be
+    - EC2 instances - HTTP
+    - ECS task - HTTP
+    - Lambda functions - HTTP request is translated into a JSON event
+    - Private IP Addresses
+- Listener Rules can be configured to route traffic to a different target groups based on: 
+  - Path (example.com/users & exmaple.com/posts)
+  - Hostname (one.example.com & other.example.com)
+  - Query String (example.com/users?id=123&order=false)
+  - Request Headers
+  - Source IP address
+  
+
+<b>Network Load Balancer (NLB) </b>
+- Operates at Layer 4 (TCP, TLS, UDP)
+- Can handle millions of request per seconds (extreme performance)
+- Lower latency ~ 100ms (vs 400 ms for ALB)
+- 1 static public IP per AZ (vs a static hostname for CLB & ALB)
+- Elastic IP can be assigned to NLB (helpful fro whitelisting specific IP)
+- Maintains the same connection from client all the way to the target
+- <b>No security groups can be attached to NLBs. </b> They just forward the incoming traffic to the right target group as if those request were directly coming from client. so the <b>attached instances must allow TCP traffic on port 80 from anywhere</b>
+- Within a target group, NLB can send traffic to
+  - <b>EC2 Instances</b>
+    - if you specify targets using an instance ID, traffic is routed to instance using the primary private IP address
+  - <b>IP Addresses</b>
+    - Used when you want to balance load for a physical server having a static IP.
+  - <b>Application Load Balancer (ALB)</b>
+    - Used when you want a static IP provided by an NLB but also want to use the features provided by ALB at the application layer.
+
+<b>Gateway Load Balancer (GWLB)</b>
+- Operataes at layer 4 (Network Layer) - IP protocol
+- Used to route requests to a fleet of 3rd party virtual appliances like Firewalls, Intrusion Detection and Prevention System (IDPS), etc
+- Performs two fuctions:
+  - Transparent Network Gateway (single entry/exit for all traffic)
+  - Load Balancer (distributes traffic to a virtual appliances)
+- Uses GENEVE protocol
+- Target groups for GWLB could be
+  - EC2 instances
+  - IP address
+
+### Sticky Sessions (Session Affinity)
+- Request coming from client is always redirected to the same instance based on a cookie. After the cookie experies, the request coming from the same user might be redirected to another instance.
+- <b>Only supported by CLB & ALB</b>
+- Used to ensure the user doesn't lose his session data, like login or cart info, while navigating between web pages.
+- <b>Stickiness may cause load imbalance</b>
+- Cookies could be
+  - Application-based (TTL defined by the application)
+  - Load Balancer generated (TTL defined by the load balancer)
+
+### Cross-zone Loading Balancing
+- Allows ELBs in different AZ containing unbalanced number of instances to distributes the traffic evenly across all intances in all the AZ registered under a load balancer.
+- Supported Load Balancers
+  - Classic Load Balancer
+    - Disabled by default
+    - No charges for inter AZ data
+  - Application Load Balancer
+    - Always on (can't disabled
+    - No charges for inter AZ data
+  - Network Load Balancer
+    - Disabled by default
+    - Charges for inter AZ data
+
+### In-flight Encryption
+- Use an NLB with a TCP listener & terminate SSL on EC2 Instances
+- Use an ALB with an HTTPs listener, install SSL certificates on the ALB & terminate SSL on the ALB
+- Communication between ALB & EC2 instances can happen over HTTP inside the VPC
+- <b>Server Name Indication (SNI)</b>
+  - SNI allows us to load multiple SSL certificates on one Load Balancer to serve multiple websites securely
+  - <b>Only works for ALB & CLB </b> (CLB only supports one SSL certificates)
+  - <b>Supported in Cloudfront</b> also
+
 ___
 
-## Storage
+# Storage
+### Instance Store
+### Elastic Block Storage (EBS)
+### Elastic File System (EFS)
+### Simple Storage Service (S3)
+### Relational Database (RDS)
 
 ## Network
 
