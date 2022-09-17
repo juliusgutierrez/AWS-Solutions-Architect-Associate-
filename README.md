@@ -14,7 +14,7 @@ ___
 - It is possible to bootstrap our instances using an EC2 User data script
 - bootstrapping means launching commands when a machine starts
 - Scripts is only run once at the instance first start
-- EC2 user data is used to automate boot task such ass: 
+- EC2 user data is used to automate boot task such as: 
   - Installing updates
   - Installing software
   - Downloading commons files from the internet
@@ -22,7 +22,7 @@ ___
 
 ### Instance Types
 - General purpose
-  - Great for diversity of workloads such ass web servers or code repositories
+  - Great for diversity of workloads such as web servers or code repositories
   - Balance between compute, memory and networking
 - Compute Optimized
   - Great for compute intensive task
@@ -78,7 +78,7 @@ ___
     - data analysis
     - image processing
 - Dedicated Hosts
-  - Server hard is allocated to a specific company
+  - Server hardware is allocated to a specific company
   - 1 or 3 year reservation period
   - Useful for software that have complicated licensing model (BYOL - bring you own license) or for companies that have a strong regulatory or compliance needs. 
   - Most expensive option
@@ -96,8 +96,8 @@ ___
   - <b>One-time</b>: Request once opened, spins up the spot instances and the request closes.
   - <b>Persistent</b>:
     - Request will stay disabled while the spot instances are up and running
-    - It becomes acive after the spot instance is interrupted.
-    - If you stop the spot instance, the requet will become active only afer you start the spot instance.
+    - It becomes active after the spot instance is interrupted.
+    - If you stop the spot instance, the request will become active only after you start the spot instance.
   - You can only cancel spot instance request that are open, active, or disabled.
   - Cancelling a Spot Request doest not terminate instances. you must first cancel a Spot Request, and then terminate the associated Spot Instances.
 - Spot Fleets
@@ -139,7 +139,7 @@ ___
   
 ### Elastic Network Interfaces (ENI)
 - ENI is a virtual network card that <b>gives a private IP to an EC2 instance </b>
-- A primary ENI is created and attached to the instance upon creation and will be deleted automatically upon instance terminatio.
+- A primary ENI is created and attached to the instance upon creation and will be deleted automatically upon instance termination.
 - We can create additional ENIs and attach them to an EC2 instance to access it via multiple private IPs.
 - We can detach & attach ENIs across instances
 - ENIs are tied to the subnet hence to the AZ
@@ -151,7 +151,7 @@ ___
   - EBS root volume is destroyed
 - Hibernate
   - Hibernate save the contents from the instance memory(RAM) to the EBS root volume
-  - EBS root volumne is preserved
+  - EBS root volume is preserved
   - The instance boots much faster as the OS is not stopped and restarted
   - When you start your instance:
     - EBS root volume is restored to its previous state
@@ -233,7 +233,7 @@ ___
 ### Types
 <b>Classic Load Balancer (CLB) - deprecated</b>
 - Load balancing to a single application
-- Supports HTTP, HTTPS (layer 7) & TCP, SL (layer 3)
+- Supports HTTP, HTTPS (layer 7) & TCP, SSL (layer 3)
 - Provides a fixed hostnames (`xxx.region.elb.amazonaws.com`)
 
 <b>Application Load Balancer (ALB) </b>
@@ -267,7 +267,7 @@ ___
 - Can handle millions of request per seconds (extreme performance)
 - Lower latency ~ 100ms (vs 400 ms for ALB)
 - 1 static public IP per AZ (vs a static hostname for CLB & ALB)
-- Elastic IP can be assigned to NLB (helpful fro whitelisting specific IP)
+- Elastic IP can be assigned to NLB (helpful for whitelisting specific IP)
 - Maintains the same connection from client all the way to the target
 - <b>No security groups can be attached to NLBs. </b> They just forward the incoming traffic to the right target group as if those request were directly coming from client. so the <b>attached instances must allow TCP traffic on port 80 from anywhere</b>
 - Within a target group, NLB can send traffic to
@@ -279,9 +279,9 @@ ___
     - Used when you want a static IP provided by an NLB but also want to use the features provided by ALB at the application layer.
 
 <b>Gateway Load Balancer (GWLB)</b>
-- Operataes at layer 4 (Network Layer) - IP protocol
+- Operates at layer 4 (Network Layer) - IP protocol
 - Used to route requests to a fleet of 3rd party virtual appliances like Firewalls, Intrusion Detection and Prevention System (IDPS), etc
-- Performs two fuctions:
+- Performs two functions:
   - Transparent Network Gateway (single entry/exit for all traffic)
   - Load Balancer (distributes traffic to a virtual appliances)
 - Uses GENEVE protocol
@@ -290,7 +290,7 @@ ___
   - IP address
 
 ### Sticky Sessions (Session Affinity)
-- Request coming from client is always redirected to the same instance based on a cookie. After the cookie experies, the request coming from the same user might be redirected to another instance.
+- Request coming from client is always redirected to the same instance based on a cookie. After the cookie expires, the request coming from the same user might be redirected to another instance.
 - <b>Only supported by CLB & ALB</b>
 - Used to ensure the user doesn't lose his session data, like login or cart info, while navigating between web pages.
 - <b>Stickiness may cause load imbalance</b>
@@ -299,7 +299,7 @@ ___
   - Load Balancer generated (TTL defined by the load balancer)
 
 ### Cross-zone Loading Balancing
-- Allows ELBs in different AZ containing unbalanced number of instances to distributes the traffic evenly across all intances in all the AZ registered under a load balancer.
+- Allows ELBs in different AZ containing unbalanced number of instances to distributes the traffic evenly across all instances in all the AZ registered under a load balancer.
 - Supported Load Balancers
   - Classic Load Balancer
     - Disabled by default
@@ -332,7 +332,7 @@ ___
 - Disabled by default
 
 Misc
-- Security Group fro a public facing ELB
+- Security Group for a public facing ELB
   - ELB will be publicly available on the internet, so its security group should allow HTTP and HTTPS traffic from anywhere. EC2 should only allow traffic from the ELB, so its security group should allow HTTP requests from ELB's security group
 
 ___
