@@ -320,6 +320,21 @@ ___
   - <b>Only works for ALB & CLB </b> (CLB only supports one SSL certificates)
   - <b>Supported in Cloudfront</b> also
 
+### Connection Draining (De-registration delay)
+- When an instance is to be de-registered from the ELB, the in-flight requests being served by that instance are given some pre-defined time to complete before the ELB de-register it.
+- ELB stops sending new requests to the EC2 instance which is de-registering
+- Set manually (0 to 3600 seconds) <b>(default : 300 secondss)</b>
+> For instances behind an ELB and using ASG, increase the de-registration delay to ensure that the in-flight are completed before the ELB deregisters an instance which is to be terminated by the ASG.
+
+### Access Logs 
+- Captures detailed information about requests sent to the load balancer
+- Used to analyze traffic patterns and troubleshoot issues
+- Disabled by default
+
+Misc
+- Security Group fro a public facing ELB
+  - ELB will be publicly available on the internet, so its security group should allow HTTP and HTTPS traffic from anywhere. EC2 should only allow traffic from the ELB, so its security group should allow HTTP requests from ELB's security group
+
 ___
 
 # Storage
