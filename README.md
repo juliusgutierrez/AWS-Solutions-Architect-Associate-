@@ -1,8 +1,5 @@
 # AWS-Solutions-Architect-Associate (C00-003)
 ___
-* [Elastic Compute Cloud (EC2)](#Elastic Compute Cloud (EC2))
-* [Elastic Load Balancer (ELB)](##Elastic Load Balancer (ELB))
-
 # Computing
 
 ## Elastic Compute Cloud (EC2)
