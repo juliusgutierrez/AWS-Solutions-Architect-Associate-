@@ -341,22 +341,22 @@ ___
 - Free (pay for the underlying resources)
 - IAM roles attached to an ASG will get assigned by an ELB (hence replace them)
 
-> Even if an ASG is deployed across 3 AZs, minimum number of instances to remain highly available is still 2
+> - Even if an ASG is deployed across 3 AZs, minimum number of instances to remain highly available is still 2
 >
-> If you have an ASG with running instances adn you delete the ASG , the instances will be terminated and the ASG will be deleted.
+> - If you have an ASG with running instances and, you delete the ASG , The instances will be terminated and the ASG will be deleted.
 > 
 
 ### Scaling Policies
 - <b>Schedule Policies</b>
-  - Scale based on a schedule (ex. increate the min capacity to 10 at 5PM on Fridays)
+  - Scale based on a schedule (ex. create the min capacity to 10 at 5PM on Fridays)
   - Used when the load pattern is predictable
 - <b>Simple Scaling</b>
   - Scale to certain size on a `CloudWatch` alarm
   - Ex. when CPU > 90%, then scale to 10 instances
 - <b>Step Scaling</b>
-  - SScale incrementally in steps using `CloudWatch` alarms
+  - Scale incrementally in steps using `CloudWatch` alarms
   - Ex. when CPU > 70%, then add 2 units and when CPU < 30%, then remove 1 unit
-  - Specify the <b>insstance warmup time</b> to scale faster
+  - Specify the <b>instance warmup time</b> to scale faster
 - <b>Target Tracking Scaling</b>
   - ASG maintains a `CloudWatch` metric and scale accordingly (automatically crate CW alarms)
   - Ex. maintain CPU usage at 40%
@@ -405,10 +405,10 @@ an ELB are still not terminated by the ASG.
  
 ### Re-balancing AZs
 - ASG ensures that the group never goes below the minimum scale. Actions such as changing the AZ for the group or explicitly terminating
-or detaching instances can lead to the ASG becoming unbalanced between ASs. In such cases, ASG compensates by <b>re-balancing</b> 
+or detaching instances can lead to the ASG becoming unbalanced between AZs. In such cases, ASG compensates by <b>re-balancing</b> 
 the AZs by <b>launching new instances before terminating the old ones,</b> so that re-balancing does not compromise the performance or availability of the application.
 
-### Lifcycle Hooks
+### Lifecycle Hooks
 - Used to perform extra steps before creating or terminating an instance. 
   - Example: 
     - Install some extra software or do some checks (during pending state) before declaring the instance as `in service`
