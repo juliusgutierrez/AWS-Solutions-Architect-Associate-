@@ -420,6 +420,84 @@ the AZs by <b>launching new instances before terminating the old ones,</b> so th
   - The AMI used to launch the instance still exists
   - The instance is not a member of another ASG
   - The instance is launch into one of the AZ defined in your ASG
+
+## Lambda
+
+- Function as a Service (FaaS)
+- Serverless
+- Auto-scaling
+- Pay per request (number of invocations) and compute time
+- Integrated with `CloudWatch` for monitoring
+- <b>Not good for running containerized application </b> 
+- Can package and deploy Lambda functions as container images
+
+### Performance
+- Increase RAM will improve CPU and network
+- RAM: 128 MB - 10GB
+- <b>Max execution time: 15 mins</b>
+- Disk capacity in function container (`/tmp`): 512 MB
+- Environment variables: 4KB
+
+### Deployment
+- Deployment size
+  - Compressed: 50 MB
+  - Uncompressed: 250 MB
+- If you intend to reuse code in more than one Lambda function, consider creating a
+<b>Lambda Layer</b> (a ZIP archive that contains libraries) for the reusable code. With Layers,
+You can <b>use libraries in your function without including them in the deployment package.</b>
+Layers let you keep you deployment package small, which makes deployment easier. A function can use up to 
+5 layers at a time.
+
+### Networking
+- By default, <b>Lambda function operates from an AWS-owned VPC</b> and hence have <b>access to any public internet</b>
+or <b>public AWS API</b> (ex. lambda functions can interact with AWS `DynamoDB` APIs to `PutItem`)
+- Once a Lambda function is <b>VPC-enabled</b>, all network from your function is subject to 
+the routing rules of your VPC/Subnet. If your function needs to interact with a public resource, it will need a
+<b>`NAT Gateway`</b>. You should only enable your functions for VPC access when you need to interact with
+a private resource located in a private subnet (ex. RDS databse)
+
+> To enable your Lambda function to access resources inside your private VPC, you must provide <b>VPC subnet IDs</b> and 
+<b>Security Group IDs</b>. AWS Lamda uses this information to set up ENIs.
+
+### Supported Languages
+- Node.js
+- Python 
+- Java
+- C#
+- Golang
+- Ruby
+- Any other language using Custom Runtime API (community supported,Rust)
+
+### Use cases
+- Serverless thumbnail creation using S3 & Lambda
+- Serverless CRON job using EventBridge & Lambda
+
+### Lambda@Edge
+- Deploy Lambda function alongside your `CloudFront` CDN for computing at edge locations
+- Customize the CDN content using Lambda at the edge location (responsive)
+- No server management (Lambda is deployed globally)
+- Pay for what you see (no provisioning)
+- Can be sued to modify `CloudFront` request & responses.
+- We can create a global application using `Lambda@Edge` where `S3` hosts a static website
+which uses client side JS to ssend requests to CF which will process the request in a lambda function
+in that edge location to perform some operation like fetching data from `DynamoDB`.
+
+## Step Functions
+- Used to build <b>serverless workflows</b> to <b>orchestrate Lambda Functions</b>
+- Represent flow as a <b>JSON state machine</b>
+- Maximum workflow execution time: 1 year
+- Features: sequence, parallel, conditions, timeouts, error handling. etc
+- Provides a <b>visual graph</b> showing the current state and which path workflow has taken
+
+### Simple Wroklow Service (SWF)
+- Outdated service (step functions are preferred instead)
+- Code runs on EC2 (not serverless)
+- <b>Ensures that a task is never duplicated</b> (could replace standard SQS queues)
+- 1 year max runtime
+- <b>Built-in human intervention step</b>
+- Step functions are recommended to be used for new applications, except: 
+  - If you need external signals to intervene in the processes
+  - If you need child processes that return values to parent processes
 ___
 
 # Storage
