@@ -501,8 +501,103 @@ in that edge location to perform some operation like fetching data from `DynamoD
 ___
 
 # Storage
-### Instance Store
-### Elastic Block Storage (EBS)
+## Instance Store
+- <b>Hardware storage directly attached to EC2 instance</b> (cannot be detached and attached to another instance)
+- <b>Highest IOPS</b> of any available storate (millions of IOPS)
+- Ephemeral storage (losses data when instance is stopped, <b>hibernated</b> or terminated)
+- Good for buffer / cache / scratch data / temporary content
+- AMI created from an instance does not have its instance store volume preserved
+
+> You can specify the instance store volumes only when you launch an instance. You can't attach instance store volumnes
+> to an instance after you've launched it
+ 
+### RAID
+- <b>RAID 0</b>
+  - Improved performance of a storage volume by distributing reads & writes in a stripe across attached volumes
+  - If you add a storage volume, you get the straight addition of throughput and IOPS
+  - for high performance applications
+- <b>RAID 1</b>
+  - Improved data availability by mirroring data in multiple volumes
+  - For critical applications
+
+## Elastic Block Storage (EBS)
+- Volume <b>Network Drive</b> (provides low latency access to data)
+- Can only be mounted to 1 instance at a time (except EBS multi-attach)
+- <b>Bound to an AZ</b>
+- Must provision capacity in advance (size in GB & throughput in IOPS)
+- By default, upon instance termination, the root EBS volume is deleted and any other attached EBS volume is not deleted
+(can be over-ridden using `DeleteOnTermination` attributes)
+- To replicate an EBS volume across AZ or region, need to copy its snapshot
+- EBS multi-attach allows the same EBS volume to attach to multiple EC2 instances <b>in the same AZ</b>
+
+> `DeleteOnTermination` attributes can be updated for the root EBS volume only from the CLI
+
+### Volume Type
+
+#### General Purpose SSD
+- Good for system boot volumes, virtual desktops
+- Storage: 1GB - 16 TB
+- **gp3** 
+  - **3,00 IOPS baseline** (max 16,000 - independent of size)
+  - 125 MiB/s throughput (max 1000 MiB/s - independent of size)
+- **gp2**
+  - **Burst IOPS up to 3,000**
+  - **3 IOPS per GB**
+  - **Max IOPS: 16,000** (at 5,334 GB)
+
+#### Provision IOPS SSD
+- Optimized for **Transaction-intensive Applications** with high frequency of **small & random IO operations.**
+They are sensitive to increased I/O latency.
+- Maintain high IOPS keeping I/O latency down by maintaining a **low queue length** and a high number of IOPS available to the volume.
+- **Supports EBS Multi-attach** (not supported by other types)
+- **io1** or **io2**
+  - Storage: 4GB - 16 TB
+  - Max IOPS: **64,000 for Nitro EC2 Instances & 32,000 for non-Nitro**
+  - **50 IOPS per GB** (64,000 IOPS at 1,280 GB)
+  - io2 have more durability and more IOPS per GB (at the assme price as io1)
+- **io2 Block Express**
+  - Storage: 4GiB - 64 TB
+  - Sub-millisecond latency
+  - Max IOPS: 256,000
+  - 1000 IOPS per GB
+
+#### Hard Disk Drives (HDD)
+- Optimized for <b>Through-put intensive Applications</b> that require <b>large & sequential IO operation</b>
+and are less sensitive to increase I/O latency (big data, data warehousing, log processing)
+- Maintain high throughput to HDD-backed volumes by maintaining a <b>high queue length</b> when 
+performing a large, sequential I/O
+- <b>Cannot be used as boot volume</b> for an EC2 instance
+- Storage: 125 MB - 16 TB
+- <b>Throughput Optimized HDD (st1)</b>
+  - Optimized for large sequential read and writes (Big data, Data Warehouses, Log processing)
+  - <b>Max throughput: 500 MB/s</b>
+  - <b>Max IOPS: 500</b>
+- <b>Cold HDD (sc1)</b>
+  - For infrequently accessed data
+  - Cheapest
+  - <b>Max throughput: 250: MB/s</b>
+  - <b>Max IOPS: 250</b>
+
+### Encryption
+- Optional
+- For Encrypted EBS volumes
+  - Data at rest is encrypted
+  - <b>Data in-flight between the instance and the volume is encrypted</b>
+  - All the snapshots are encrypted
+  - All volumes created from the snapshot are encrypted
+- Encrypt an un-encrypted EBS volume
+  - Create an EBS snapshot of the volume
+  - Copy the EBS snapshot and encrypt the new copy
+  - Create a new EBS volume from the encrypted snapshot (the volume will be automatically encrypted)
+
+> All EBS types and all instance families support encryption but not all instance types support encryption.
+
+### Snapshot
+- <b>Data Lifecycle Manager (DLM)</b> can be used to automate the creation, retention and deletion of snapshots of EBS volumes.
+- Snapshots are incremental
+- Only the most recent snapshot is required to restore the volume.
+
+
 ### Elastic File System (EFS)
 ### Simple Storage Service (S3)
 ### Relational Database (RDS)
