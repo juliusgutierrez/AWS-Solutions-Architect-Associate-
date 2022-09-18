@@ -330,10 +330,96 @@ ___
 - Used to analyze traffic patterns and troubleshoot issues
 - Disabled by default
 
-Misc
+### Misc
 - Security Group for a public facing ELB
   - ELB will be publicly available on the internet, so its security group should allow HTTP and HTTPS traffic from anywhere. EC2 should only allow traffic from the ELB, so its security group should allow HTTP requests from ELB's security group
 
+## Auto Scaling Group (ASG)
+- Regional Service
+- Supports Multi AZ
+- Automatically add or remove instances (scale horizontally) based on the load
+- Free (pay for the underlying resources)
+- IAM roles attached to an ASG will get assigned by an ELB (hence replace them)
+
+> Even if an ASG is deployed across 3 AZs, minimum number of instances to remain highly available is still 2
+>
+> If you have an ASG with running instances adn you delete the ASG , the instances will be terminated and the ASG will be deleted.
+> 
+
+### Scaling Policies
+- <b>Schedule Policies</b>
+  - Scale based on a schedule (ex. increate the min capacity to 10 at 5PM on Fridays)
+  - Used when the load pattern is predictable
+- <b>Simple Scaling</b>
+  - Scale to certain size on a `CloudWatch` alarm
+  - Ex. when CPU > 90%, then scale to 10 instances
+- <b>Step Scaling</b>
+  - SScale incrementally in steps using `CloudWatch` alarms
+  - Ex. when CPU > 70%, then add 2 units and when CPU < 30%, then remove 1 unit
+  - Specify the <b>insstance warmup time</b> to scale faster
+- <b>Target Tracking Scaling</b>
+  - ASG maintains a `CloudWatch` metric and scale accordingly (automatically crate CW alarms)
+  - Ex. maintain CPU usage at 40%
+- <b>Predictive Scaling</b>
+  - Historical data is used to predict the load pattern using ML and scale automatically
+
+### Launch Configuration & Launch Template
+- Defines the following info for ASG
+  - AMI (Instance Type)
+  - EC2 User Data
+  - EBS Volumes
+  - Security Groups
+  - SSH Key Pair
+  - Min / Max / Desired Capacity
+  - Subnets (where the instances will be created)
+  - Load Balancer (specify which ELB to attach instances)
+  - Scaling Policy
+- <b>Launch Configuration (legacy)</b>
+  - Cannot be updated (must be re-created)
+  - <b>Does not support Spot Instances</b>
+- <b>Launch Template (newer)</b>
+  - Versioned
+  - Can be updated
+  - <b>Supports both On-demand and Spot Instances</b>
+  - Recommended by AWS
+
+### Scaling Cooldown
+- After a scaling activity happens, the ASG goes into cooldown period(default 300 seconds) 
+during which it does not launch or terminate additional instances (ignores scaling requests) to allow the metrics to stabilize
+- Use a ready to use AMI to launch instances faster to be able to reduce the cooldown period
+
+### Health Checks
+- By default, ASG uses the EC2 status check (not the ELB health check). this could explain why some instances that are labelled as unhealthy 
+an ELB are still not terminated by the ASG.
+- To prevent ASG from replacing unhealthy instances, suspend the <b>ReplaceUnhealthy</b> process type
+
+> ASG creates new scaling activity for terminating the unhealthy instance and then terminates it. 
+> Later, another scaling activity launches a new instance to replace the terminated instance.
+
+### Termination Policy 
+- Select the AZ with the most number of instances
+- Delete the instance with the oldest launch configuration
+- Delete the instance which is closes to the next billing hour
+> - ASG does not immediately terminate instances with an <b>Impaired</b> status, it waits a few minutes for the instance to recover
+> - ASG doesn't terminate an instance that came into service based on EC2 status checks and ELB health checks until the <b>health check grace period</b> expires.
+ 
+### Re-balancing AZs
+- ASG ensures that the group never goes below the minimum scale. Actions such as changing the AZ for the group or explicitly terminating
+or detaching instances can lead to the ASG becoming unbalanced between ASs. In such cases, ASG compensates by <b>re-balancing</b> 
+the AZs by <b>launching new instances before terminating the old ones,</b> so that re-balancing does not compromise the performance or availability of the application.
+
+### Lifcycle Hooks
+- Used to perform extra steps before creating or terminating an instance. 
+  - Example: 
+    - Install some extra software or do some checks (during pending state) before declaring the instance as `in service`
+    - Before the instance is terminated (terminating state). extract the log files
+  - <b>Without lifecycle hooks, pending and terminating states are avoided</b>
+
+### Attach running instances to an existing ASG
+- The running instance must meet the following criteria
+  - The AMI used to launch the instance still exists
+  - The instance is not a member of another ASG
+  - The instance is launch into one of the AZ defined in your ASG
 ___
 
 # Storage
