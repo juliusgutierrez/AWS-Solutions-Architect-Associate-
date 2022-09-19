@@ -702,6 +702,174 @@ performing a large, sequential I/O
 or subdomain `portal.tutorialsdojo.com`, the name of the bucket must be `portal.tutorialsdojo.com`
 
 ### MFA Delete
+- MFA required to
+  - permanently delete on object version
+  - suspend versioning on the bucket
+- <b>Bucket Versioning must be enabled</b>
+- can only be enabled or disabled by root user
+
+### Server Access Logging
+- Most detailed way of logging access to S3 buckets (better than `CloudTrail`)
+- Does not support <b>Data Events</b> & <b>Log File Validation</b> (use `CloudTrail` for that)
+- Store S3 access logs into another bucket
+- Logging bucket should not be the same as monitored bucket (logging loop)
+
+### Replication
+- <b>Asynchronous replication</b>
+- Objects are replicated with the <b>same version ID</b>
+- Supports <b>cross-origin</b> and <b>cross-account</b> replication
+- <b>Versioning must be enabled for source and destination buckets</b>
+- For DELETE operations:
+  - Replicate delete markers from source to target (optional)
+  - Permanent deletes are not replicated
+- There is <b>no chaining of replication</b>. So, if bucket 1 has replication into bucket 2, which has replication into bucket 3,
+Then objects created in bucket 1 are not replicated to bucket 3.
+
+### Pre-signed URL
+- Pre-signed URLs for S3 have temporary access token as query string parameters which allo anyone with the URL
+to temporarily access the resource before the URL expires (default 1 hour)
+- Pre-signed URLS inherit the permission of the user who generated it
+- Uses:
+  - Allow only logged-in users to download a premium video
+  - Allow users to upload files to a precise location in the bucket
+  
+### Storage Classes
+- Data can be transitioned between storage classes manually or automatically using lifecycle rules
+- Data can be put directly into any storage class
+- <b>Standard</b>
+  - 99.99% availability
+  - Most Expensive
+  - Instant retrieval
+  - No cost on retrieval (only storage cost)
+  - For frequently accessed data
+- <b>Infrequent Access</b>
+  - For data that is infrequently accessed, but requires rapid access when needed
+  - Lower storage cost than Standard but <b>cost on retrieval</b>
+  - Can <b>move data into IA from Standard only after 30 days</b>
+  - Two types:
+    - <b>Standard IA</b>
+      - 99.9% availability
+    - <b>One-Zone IA</b>
+      - 99.5% availability
+      - Data is lost if AZ fails
+      - Storage for infrequently accessed data that can be easily recreated
+- <b>Glacier</b>
+  - For data archival
+  - Cost for storage and retrieval
+  - <b>Can move data into Glacier from Standard anytime</b>
+  - Objects cannot be directly accessed, they first need to be restored which could take some time (depending on the tier) to fetch the object
+  - <b>Default encryption for data at rest and in-transit</b>
+  - Three Types:
+    - <b>Glacier Instant Retrieval</b>
+      - 99.9% availability
+      - Millisecond retrieval
+      - Minimum storage duration of <b>90 days</b>
+      - Great for data accessed once a quarter
+    - <b>Glacier Flexible Retrieval</b>
+      - 99.99% availability
+      - 3 retrieval flexibility (decreasing order of cost):
+        - Expedited (1 to 5 minutes)
+          - Can <b>provision retrieval capacity</b> for reliability
+          - Without provisioned capacity expedited retrievals might be rejected in situations of high demand
+        - Standard (3 to 5 hours)
+        - Bulk (5 to 12 hours)
+    - <b>Glacier Deep Archive</b>
+      - 99.99% availability
+      - 2 flexible retrieval:
+        - Standard (12 hours)
+        - Bulk (48 hours)
+      - Minimum storage duration of <b>180 days</b>
+      - Lowest cost
+- <b>Intelligent Tiering</b>
+  - 99.9 availability
+  - Move objects automatically between access tiers based on usage
+  - Small monthly monitoring and auto-tiering fee
+  - <b>No retrieval charges</b>
+
+### Moving between Storage classes
+![](images/storage_class_moving.png "Moving between storage class image")
+
+### Lifecycle Rules
+- Used to automate transition or expiration actions on S3 objects
+- <b>Transition Action</b> (transitioned to another storage class)
+- <b>Expiration Action</b> (delete objects after some time)
+  - delete a version of an object
+  - delete incomplete multi-part uploads
+- Lifecycle Rules can be created for a prefix (ex: `s3://mybucket/mp3/*`) or objects tags (ex: Department: Finance)
+> - When you apply a retention period to an object version explicitly, you specify a `Retain Until Date` for the object version
+> - When you use bucket default settings, you don't specify a `Retain Until Date`. Instead, you specify a duration, for which every object
+> version placed in the bucket should be protected.
+> - Different versions of a single object can have different retention modes and periods
+
+### S3 Analytics
+- Provides analytics to determine when to transition data into different storage classes
+- <b>Does not work for ONEZONE_IA & GLACIER</b>
+
+### Performance
+- 3,500 PUT/COPY/POST/DELETE and 5,500 GET/HEAD request per seconds per prefix
+- Recommended to spread data across prefixes for maximum performance
+- SSE-KMS may create a bottleneck in S3 Performance
+- Performance Optimization
+  - <b>Multi-part Upload</b>
+    - Parallelize upload
+    - <b>Recommended for files > 100MB</b>
+    - <b>must use files > 5GB</b>
+  - <b>Byte-range fetches</b>
+    - Parallelize download requests by fetching specific byte ranges in each request
+    - Better resilience in case of failures since we only refetch the failed byte range and not the whole file
+  - <b>S3 Transfer Acceleration</b>
+    - Speed up <b>upload and download</b> for large object (> 1GB) for global users
+    - Data is ingested at the nearest edge location and is transferred over AWS private network (uses `CloudFront` internally)
+
+### S3 Select
+- Select a subset of data from S3 using <b>SQL queries (server-side filtering)</b>
+- Less network cost
+- Less CPU cost on the client side
+
+### Data Transfer Cost
+- Uploads to S3 are free
+- Downloads from S3 are paid
+- Using S3 Transfer Acceleration, you pay for transfer that are accelerated
+- Since buckets are defined within a region, <b>data transfer within a region is free</b>
+
+### S3 Notification Events
+- Optional
+- Generates events for operations performed on the bucket or objects
+- Object name filtering using prefix and suffix matching
+- Can create as many `S3 events` as desired
+- Targets
+  - SNS Topics
+  - SQS Standard Queues (not FIFO Queues)
+  - Lambda Functions
+  - Amazon EventBridge
+
+### Requester Pays Buckets
+- Requester pays the cost of the request and the data downloaded from the bucket. The bucket owner only pays for the storage.
+- Used to share large datasets with other AWS accounts
+- The requester must be authenticated in AWS (cannot be anonymous)
+
+### Object Lock
+- WORM (Write Once Read Many) model
+- Block an object version modification or deletion for a specified amount of time
+- Modes:
+  - <b>Governance mode</b>
+    - Only users with special permissions can overwrite or delete the object version or alter its lock settings
+  - <b>Compliance mode</b>
+    - A protected object version cannot be overwritten or deleted by any user, including the root user
+    - The object's retention mode can't be changed, and the retention period can't be shortened.
+- Glacier Vault Lock
+  - WORM (Write Once Read Many) model for Glacier
+  - For compliance and data retention
+
+### Access Points
+### S3 Object Lambda
+### S3 Batch Operations
+
+### Performance
+
+
+
+
 
 ## Relational Database (RDS)
 
