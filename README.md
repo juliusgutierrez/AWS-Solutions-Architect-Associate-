@@ -477,9 +477,9 @@ a private resource located in a private subnet (ex. RDS databse)
 - Customize the CDN content using Lambda at the edge location (responsive)
 - No server management (Lambda is deployed globally)
 - Pay for what you see (no provisioning)
-- Can be sued to modify `CloudFront` request & responses.
+- Can be used to modify `CloudFront` request & responses.
 - We can create a global application using `Lambda@Edge` where `S3` hosts a static website
-which uses client side JS to ssend requests to CF which will process the request in a lambda function
+which uses client side JS to send requests to `CloudFront` which will process the request in a lambda function
 in that edge location to perform some operation like fetching data from `DynamoDB`.
 
 ## Step Functions
@@ -503,19 +503,19 @@ ___
 # Storage
 ## Instance Store
 - <b>Hardware storage directly attached to EC2 instance</b> (cannot be detached and attached to another instance)
-- <b>Highest IOPS</b> of any available storate (millions of IOPS)
+- <b>Highest IOPS</b> of any available storage (millions of IOPS)
 - Ephemeral storage (losses data when instance is stopped, <b>hibernated</b> or terminated)
 - Good for buffer / cache / scratch data / temporary content
 - AMI created from an instance does not have its instance store volume preserved
 
-> You can specify the instance store volumes only when you launch an instance. You can't attach instance store volumnes
+> You can specify the instance store volumes only when you launch an instance. You can't attach instance store volumes
 > to an instance after you've launched it
  
 ### RAID
 - <b>RAID 0</b>
   - Improved performance of a storage volume by distributing reads & writes in a stripe across attached volumes
   - If you add a storage volume, you get the straight addition of throughput and IOPS
-  - for high performance applications
+  - For high performance applications
 - <b>RAID 1</b>
   - Improved data availability by mirroring data in multiple volumes
   - For critical applications
@@ -538,7 +538,7 @@ ___
 - Good for system boot volumes, virtual desktops
 - Storage: 1GB - 16 TB
 - **gp3** 
-  - **3,00 IOPS baseline** (max 16,000 - independent of size)
+  - **3,000 IOPS baseline** (max 16,000 - independent of size)
   - 125 MiB/s throughput (max 1000 MiB/s - independent of size)
 - **gp2**
   - **Burst IOPS up to 3,000**
@@ -597,10 +597,38 @@ performing a large, sequential I/O
 - Snapshots are incremental
 - Only the most recent snapshot is required to restore the volume.
 
+## Elastic File System (EFS)
+- AWS managed Network File System (NFS)
+- Can be mounted to muntiple EC2 instances <b>across AZs</b>
+- <b>Pay per use</b> (no capacity provisioning)
+- <b>Autoscaling</b> (up to PBs)
+- Compatible with <b>Linux</b> based AMIs (<b>POSIX</b> file system)
+- <b>Uses security group to control access to EFS</b>
+- Lifecycle management feature to move files to <b>EFS-IA</b> after N days
 
-### Elastic File System (EFS)
-### Simple Storage Service (S3)
-### Relational Database (RDS)
+### Performance Mode
+- General Purpose(default)
+  - latency-sensitive uses cases (web server, CMS, etc.)
+- Max I/O
+  - higher latency & throughput (big data, media processing)
+
+### Throughput Mode
+- Bursting (default)
+  - Throughput: 50MB/s per TB
+  - Burst of up to 100MB/s
+- Provisioned
+  - Fixed throughput (provisioned)
+### Storage Tiers
+- Standard - for frequently accessed files
+- Infrequent access (EFS-IA) - cost to retrieve files, lower price to store
+
+### Security
+- `EFS Security Group` to control network traffic
+- `POSIX Permissions` to control access from hosts by IAM User or Group
+
+
+## Simple Storage Service (S3)
+## Relational Database (RDS)
 
 ## Network
 
