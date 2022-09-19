@@ -599,7 +599,7 @@ performing a large, sequential I/O
 
 ## Elastic File System (EFS)
 - AWS managed Network File System (NFS)
-- Can be mounted to muntiple EC2 instances <b>across AZs</b>
+- Can be mounted to multiple EC2 instances <b>across AZs</b>
 - <b>Pay per use</b> (no capacity provisioning)
 - <b>Autoscaling</b> (up to PBs)
 - Compatible with <b>Linux</b> based AMIs (<b>POSIX</b> file system)
@@ -626,8 +626,83 @@ performing a large, sequential I/O
 - `EFS Security Group` to control network traffic
 - `POSIX Permissions` to control access from hosts by IAM User or Group
 
-
 ## Simple Storage Service (S3)
+- Global Service
+- Object store (key-value pairs
+- <b>Buckets must have a globally unique name</b>
+- Objects have a key (full path to the object): `s3://my_bucket/my_folder/another_folder/my_file.txt`
+- The key is composed of bucket + `prefix` + <b>object name</b> + s3://my_bucket/my_folder/another_folder/my_file.txt
+- There's no concept of directories within buckets (just keys with very long names that contains slashes)
+- <b>Max object size: 5TB</b>
+- Durability: 99.99999999999% (total 11 9's)
+- <b>SYNC</b> command can be used to <b>copy data between buckets</b>, possibly in <b>different regions</b>
+> - S3 delivers <b>strong read after-write consistency</b> (if an object is overwritten and immediately read, `S3` always 
+> returns the latest version of the object)
+> - S3 is strongly consistent for all `GET`, `PUT` and `LIST` operation
+
+### Bucket Versioning
+- Enabled at the bucket level
+- Protects against unintended deletes
+- Ability to restore to a previous version
+- Any file that is not versioned prior to enabling versioning will have version `null`
+- Suspending version does not delete the previous versions, just disables it for the future
+- To restore a deleted object, delete it's `delete marker`
+> - Versioning can only be suspended once it has enabled.
+> - Once you version-enable a bucket, it can never return to an un-versioned state
+
+### Encryption
+- Can be enabled at the bucket level or a the object level
+- #### Server Side Encryption (SSE)
+  - SSE-S3
+    - Keys managed by S3
+    - AES-256 encryption
+    - HTTP or HTTPS can be used
+    - Must set header: `"x-amz-server-side-encryption":"AES256"`
+  - SSE-KMS
+    - Keys managed by KMS
+    - HTTP or HTTPS can be used
+    - KMS provides control over who has access to what keys as well as audit trails
+    - Must set header: `"x-amz-server-side-encryption":"aws:ksm"`
+  - SSE-C
+    - Keys managed by the client
+    - Client sends the keys in HTTPS headers for encryption/decryption (S3 discards the key after the operation)
+    - <b>HTTPS must be used</b> as key (secret) is being transferred
+- #### Client Side Encryption
+  - Keys managed by the client
+  - Client encrypts the object before sending it to S3 and decrypts it after retrieving it from S3
+
+> <b>Default Encryption</b>: encrypt the files using the default encryption (specify the encryption for the file while uploading to override the default)
+> Bucket policy can be used to force a specific type of encryption on the objects uploaded to `S3`
+
+### Access Management 
+- #### User based security
+  - IAM policies defined which API calls should be allowed for a specific user
+  - Preferred over bucket policy for <b>fine-grained access control</b>
+- #### Resource based security (Bucket Policy)
+  - Grant public access to the bucket
+  - Force objects to be encrypted at upload
+  - Cross-account access
+  - Object access Control List (ACL) - applies to the objects while uploading
+  - Bucket access Control List (ACL) - access policy that applies to the bucket
+
+> By default, an S3 object is owned by the account that uploaded it even if the bucket is owned by another
+> account. To get full access to the object, the object owner must explicitly grant the bucket owner access.
+> As a bucket owner, you can create a bucket policy to require external users to grant `bucket-owner-full-control` when 
+> uploading objects so the bucket owner can have full access to the objects.
+
+### S3 Static Websites
+- Host static websites (may contain client-side scripts) and have them accessible on the public internet over
+<b>HTTP only</b> (for HTTPS, use `CloudFront` with S3 bucket as the origin)
+- The website URL will be either of the following:
+  - `<bucket-name>.s3-website-<region>.amazonaws.com`
+  
+- If you get a `403 (forbidden)` error, make sure the bucket policy allows public reads
+- For cross-origin access to the `S3` bucket, we need to enable `CORS` on the bucket
+- To host an S3 static website on a custom domain using `Route 53`, the bucket name should be the same as your domain
+or subdomain `portal.tutorialsdojo.com`, the name of the bucket must be `portal.tutorialsdojo.com`
+
+### MFA Delete
+
 ## Relational Database (RDS)
 
 ## Network
