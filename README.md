@@ -628,7 +628,7 @@ performing a large, sequential I/O
 
 ## Simple Storage Service (S3)
 - Global Service
-- Object store (key-value pairs
+- Object store (key-value pairs)
 - <b>Buckets must have a globally unique name</b>
 - Objects have a key (full path to the object): `s3://my_bucket/my_folder/another_folder/my_file.txt`
 - The key is composed of bucket + `prefix` + <b>object name</b> + s3://my_bucket/my_folder/another_folder/my_file.txt
@@ -726,9 +726,9 @@ or subdomain `portal.tutorialsdojo.com`, the name of the bucket must be `portal.
 Then objects created in bucket 1 are not replicated to bucket 3.
 
 ### Pre-signed URL
-- Pre-signed URLs for S3 have temporary access token as query string parameters which allo anyone with the URL
+- Pre-signed URLs for S3 have temporary access token as query string parameters which allow anyone with the URL
 to temporarily access the resource before the URL expires (default 1 hour)
-- Pre-signed URLS inherit the permission of the user who generated it
+- Pre-signed URLs inherit the permission of the user who generated it
 - Uses:
   - Allow only logged-in users to download a premium video
   - Allow users to upload files to a precise location in the bucket
@@ -878,7 +878,7 @@ to temporarily access the resource before the URL expires (default 1 hour)
   - Modify ACLs, tags
   - Restore object from S3 Glacier
   - Invoke Lambda function perform custom action on each object
-- managges rrties, tracks progress, send completion notification, generate reports
+- managges retries, tracks progress, send completion notification, generate reports
 - <b>You can use S3 Inventory to get object list and use S3 Select to filter objects</b>
 
 ### Performance
