@@ -862,8 +862,24 @@ to temporarily access the resource before the URL expires (default 1 hour)
   - For compliance and data retention
 
 ### Access Points
+- Each `Access Point` gets it own DNS policy to limit who can access it
+  - A specific IAM user/group
+  - One policy per Access Point -> Easier to manage complex bucket policies
+
 ### S3 Object Lambda
+- Use AWS Lambda functions to change the object before it is retrieved by the caller application
+- Only one `S3 bucket` is needed, on top which we create <b>S3 Access Point</b> and <b>S3 Object Lambda Access Points</b>
+
 ### S3 Batch Operations
+- Can perform bulk operations on existing S3 Objects with a single request
+  - Modify object metadata & properties
+  - Copy objects between S3 bucket
+  - <b>Encrypt un-encrypted objects</b>
+  - Modify ACLs, tags
+  - Restore object from S3 Glacier
+  - Invoke Lambda function perform custom action on each object
+- managges rrties, tracks progress, send completion notification, generate reports
+- <b>You can use S3 Inventory to get object list and use S3 Select to filter objects</b>
 
 ### Performance
 
