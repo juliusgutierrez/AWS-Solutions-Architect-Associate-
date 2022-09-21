@@ -980,7 +980,7 @@ which uses to access the MySQL Database.
   - Used to monitor different <b>processes or threads on a DB instance</b> (ex. percentage of the CPU bandwidth and total memory
   consumed by each database process in your RDS instance)
 
-### Maintennace & Upgrade
+### Maintenance & Upgrade
 Any database engine level upgrade for an RDS DB instance will Multi-AZ deployment triggers both primary and standby DB instances
 to be upgraded at the same time. This causes <b>downtime</b> until the upgrade is complete.
 This is why it should be done during maintenance window.
