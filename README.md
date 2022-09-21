@@ -971,7 +971,7 @@ which uses to access the MySQL Database.
   - Gather metrics from the hypervisor of the DB instance
     - CPU utilization
     - Database Connections
-    - Freeable Memory
+    - Free-able Memory
 
 - Enhanced Monitoring
   - Gathers metric from an agent running on the RDS instance
