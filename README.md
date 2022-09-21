@@ -881,14 +881,110 @@ to temporarily access the resource before the URL expires (default 1 hour)
 - managges retries, tracks progress, send completion notification, generate reports
 - <b>You can use S3 Inventory to get object list and use S3 Select to filter objects</b>
 
-### Performance
-
-
-
-
-
 ## Relational Database (RDS)
+- Regional Service
+- Supports Multi AZ
+- AWS Managed SQL Database
+- Supported Engines
+  - Postgres
+  - MySQL
+  - MariaDB
+  - Oracle
+  - MSSQL
+  - Aurora (AWS Managed Database)
+- Backed by Elastic Compute Cloud `EC2` storage
+- We don't have access to the underlying instance
+- <b>DB Connection is made on port 3306</b>
+- Security Groups are used for network security (must allow incming TCP traffic on port 3306 from specific IPs)
 
+### Backups
+- <b>Automated Backups</b> (enabled by default)
+  - Daily full backup of the database (during the define maintenance window)
+  - Backup retention: 7 days (max 35 days)
+  - Transaction logs are backed-up every <b>5 minutes</b> (point in time recovery)
+- <b>DB Snapshots</b>
+  - Manually triggered
+  - Backup retention: unlimited
+
+### AutoScaling
+- Automatically scales the RDS storage within the max limit
+- Condition for automatic storage:
+  - Free storage is less than 10% of allocated storage
+  - Low-storage lasts at least 5 minutes
+  - 6 hours have passed since last modification
+
+### Read Replicas
+- Allow us to scale the read operation (SELECT) on RDS
+- Up to 5 read replicas (within AZ, cross AZ or cross region)
+- Asynchronous Relication (seconds)
+- Replicas can be promoted to their own DB
+- Applications must update the connection string to leverage read replicas
+- Network fee for repliation
+  - Same region: free
+  - Cross region: paid
+
+>You can create a read replica as a Multi-AZ DB instance. A standby of the replica will be created in another AZ for 
+> failover support for the replica.
+
+
+### Multi AZ
+- Increase availability of the RDS database by replicating it to another AZ
+- Synchronous Replication
+- Connection string does not require to be updated(both the database can be accessed by one DNS name, 
+which allos for automatic DNS failover to standby database)
+- When failing over, <b>RDS flips the CNAME</b> record for the DB instance to point at the standby,
+which is in turn promoted to become the new primary
+- <b>Cannot be used for scaling as the standby database cannot take read/write operation</b>.
+
+### Encryption
+- At rest encryption
+  - KMS AES-256 encryption
+  - Encrypted DB -> Encrypted Snapshots, Encrypted Replicas and Vice versa
+- In flight encryption
+  - SSL certificates
+  - Force all connections to your DB instance to use SSL by setting the `rds.force_ssl` parameter to `true`
+  - To enable encryption in transit, download the <b>AWS-provided root certificates</b> & used them when connecting to DB
+To encrypt an un-encrypted RDS database:
+  - Create a snapshot of the un-encrypted database
+  - Copy the snapshot and enable encryption for the snapshot
+  - Restore the database from the encrypted snapshot
+  - Migrate applications to the new database, and delete the old database
+
+### Access Management
+- Username and Password can be used to login the database
+- `EC2` instances & `Lambda` functions should access the DB using `IAM DB Authentication` (<b>AWSAuthenticationPlugin</b> with
+<b>IAM</b>) - token based access
+- EC2 instance or Lambda function has an IAM role which allows to make an API call to the RDS service to get <b>auth token</b>
+which uses to access the MySQL Database.
+- Only Works with MySQL and Postgres
+- Auth token is valid for 15 mins
+- Network traffic is encrypted in-flight using SSL
+- <b>Central access management using IAM</b> (instead of doing it for each DB individually)
+
+### RDS Events
+- RDS event only provide operational events on the DB instance (not the data)
+- To capture data modification, events, use <b>native function</b> or <b>store procedures</b> to invoke a `Lambda` function.
+
+
+### Monitoring
+- `CloudWatch` metrics for RDS
+  - Gather metrics from the hypervisor of the DB instance
+    - CPU utilization
+    - Database Connections
+    - Freeable Memory
+
+- Enhanced Monitoring
+  - Gathers metric from an agent running on the RDS instance
+    - OS processes
+    - RDS child processes
+  - Used to monitor different <b>processes or threads on a DB instance</b> (ex. percentage of the CPU bandwidth and total memory
+  consumed by each database process in your RDS instance)
+
+### Maintennace & Upgrade
+Any database engine level upgrade for an RDS DB instance will Multi-AZ deployment triggers both primary and standby DB instances
+to be upgraded at the same time. This causes <b>downtime</b> until the upgrade is complete.
+This is why it should be done during maintenance window.
+  
 ## Network
 
 ## Messaging
