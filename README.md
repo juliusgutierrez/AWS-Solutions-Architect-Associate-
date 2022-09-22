@@ -1049,7 +1049,7 @@ if disabled and the master node fails, need to promote a Read Replica as the new
 - <b>Client needs to have multiple DB connections for failover</b>
 
 ### Aurora Global Database
-- Entire database is repliated across regions to recover from region failure
+- Entire database is replicated across regions to recover from region failure
 - Designed for <b>globally distributed application</b> with <b>low latency local reads</b> in each region
 - 1 Primary Region (read/write)
 - Up to 5 secondary (read-only) regions (replication lag < 1 second)
