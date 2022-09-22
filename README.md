@@ -984,7 +984,83 @@ which uses to access the MySQL Database.
 Any database engine level upgrade for an RDS DB instance will Multi-AZ deployment triggers both primary and standby DB instances
 to be upgraded at the same time. This causes <b>downtime</b> until the upgrade is complete.
 This is why it should be done during maintenance window.
-  
+
+## Aurora
+- Regional Service (Supports global databases)
+- Support Multi AZ
+- AWS managed relational DB cluster
+- Preferred over `Relational Database Service (RDS)`
+- Auto-scaling (max: 128 TB)
+- <b>Asynchronous Replication</b> (milliseconds)
+- <b>Supports only MySQL & PostgreSQL</b>
+- Cloud-optimized (5x performance improvement over MySQL on RDS, over 3x the performance of PostgreSQL on RDS)
+- <b>Backtrack</b>: restore data at any point of time without taking backups
+
+### Endpoints
+- Writer Endpoint (Cluster Endpoint)
+  - Always points to the master (can be used for read/write)
+  - Each Aurora DB cluster has one cluster endpoint
+- Reader Endpoint
+  - Provides load-balancing for read replicas only (used to read only)
+  - If the cluster has no read replica, it points to master (can be used to read/write)
+  - Each Aurora DB cluster has one reader endpoint
+- Custom Endpoint
+  - Used to point to a subset of replicas
+  - Provides load-balanced based on criteria other than the read-only or read-write capability of the DB instances
+like class(ex, direct internal users to low-capacity instances and direct production traffic to high-capacity instances)
+
+### High Availability & Read Scaling
+- `Self-healing` (if some data is corrupted, it will be automatically healed)
+- Storage is striped across 100s of volumes (more resilient)
+- <b>Automated failover</b>
+  - A read replica is promoted as the new master in less than 30 seconds
+  - Aurora flips the <b>CNAME</b> record for your DB instance to point at the healthy replica
+  - In case <b>no replica</b> is available, Aurora will attempt to <b>create a new DB instance</b> in the 
+<b>same AZ</b> as the original instance. This replacement of the original instance is done on a <b>best effort basis</b> and may not succeed.
+- Support for <b>Cross Region Replication</b>
+- Aurora maintains 6 copies of your data across 3 AZ:
+  - 4 copies out of 6 needed for writes (can still write if 1 AZ completely fails)
+  - 3 copies out of 6 need for reads
+
+> Each Read Replica is associated with a priority tier (0-15). In the event of a failover, Amazon Aurora will promote the Read Replica
+> that has the highest priority (lowest tier). If two or more Aurora Replicas share the same tier, then Aurora promotes the replica that is 
+> largest in size. If two or more Aurora Replicas share the same priority and size, then Aurora promotes an arbitary replica in the same promotion tier.
+
+### Encryption & Network Security
+- Encryption at rest using KMS (same as RDS)
+- Encryption in flight using SSL (same as RDS)
+- You can't SSH into Aurora instance (same as RDS)
+- Network Security is managed using Security Groups (same as RDS)
+- EC2 instances should access the DB using `IAM DB Authentication` but they can also do it using
+credentials fetched from the `SSM Parameter Store` (same as RDS)
+
+### Aurora Serverless
+- Optional
+- Automated database instantiation and auto scaling based on usage
+- Good for unpredictable workloads
+- No capacity planning needed
+- Pay per second
+
+### Aurora Multi-Master
+- Optional
+- Every node (replica) in the cluster can read and write
+- Used for immediate failover for write node (high availability in terms of write). 
+if disabled and the master node fails, need to promote a Read Replica as the new master (will take some time)
+- <b>Client needs to have multiple DB connections for failover</b>
+
+### Aurora Global Database
+- Entire database is repliated across regions to recover from region failure
+- Designed for <b>globally distributed application</b> with <b>low latency local reads</b> in each region
+- 1 Primary Region (read/write)
+- Up to 5 secondary (read-only) regions (replication lag < 1 second)
+- Up to 16 Read Replicas per secondary region
+- Helps for decreasing latency for clients in other geographical locations
+- <b>RTO of less than 1 minute</b> (to promote another region as primary)
+
+### Aurora Events
+- Invoke a `Lambda` function from an Aurora MySQL-compatible DB cluster with a native function or a stored procedure (same as RDS)
+- Used to capture data changes whenever a row is modified.
+
 ## Network
 
 ## Messaging
