@@ -1107,8 +1107,45 @@ if disabled and the master node fails, need to promote a Read Replica as the new
 
 ### Global Tables
 - For low latency access in multiple-regions
-- Applications can READ and WRTIE to the table in any region and the change will automatically be replicated to other tables (<b>active-active cross region replication</b>)
+- Applications can READ and WRITE to the table in any region and the change will automatically be replicated to other tables (<b>active-active cross region replication</b>)
 - <b>Must enable DynamoDB Streams as a pre-requisite</b> 
+
+## ElasticCache
+- Regional Service
+- AWS managed caching service
+- <b>In-memory key value store</b> with <b>sub millisecond latency</b>
+- Need to provision an underlying EC2 instance
+- <b>Makes the application stateless</b> because it doest have to cache locally
+- <b>Using `ElastiCache` requires heavy application code change</b> (setup the application to query the cache before and after querying the database)
+
+### Usage
+- DB Cache (lazy loading): cache read operations on a database (reduced latency)
+- Session Store: store user's session data like cart info (allows the application to remain stateless)
+- Global Data Store: store intermediate computation results
+
+
+### Redis vs Memcached
+
+| Redis                                                       | Memcached                                            |
+|-------------------------------------------------------------|------------------------------------------------------|
+| In-memory data store                                        | Distributed memory object cache                      |
+| Read Replicas (for scaling reads & HA)                      | No Replication                                       |
+| Backup & Restore                                            | No backup & restore                                  |
+| Single-thread                                               | Multi-threaded                                       |
+| HIPAA compliant                                             | Not HIPAA compliant                                  |
+| Data is stored in an in-memory DB which is replicated       | Data is partitioned across multiple nodes (sharding) |
+| Redis Sorted Sets are used in realtime Gaming Leadersboards |                                                      |
+| Good for auto-completion                                    |                                                      |
+| Multi-AZ support with automatic failover (DR)               |                                                      |
+
+> Notes: HIPAA stands for Health Insurance Portability and Accountability Act.
+
+### Security & Access Management
+- Network security is managed using <b>Security Groups</b> (only allow EC2 security group for incoming requests)
+- At rest encryption using KMS
+- in-flight encryption using SSL
+- Use <b>Redis Auth</b> to authenticate to `ElastiCache` for `Redis`
+- `Memcached` supports SASL-based authentication
 
 ## Network
 
