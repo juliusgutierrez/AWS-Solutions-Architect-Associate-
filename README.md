@@ -1147,6 +1147,40 @@ if disabled and the master node fails, need to promote a Read Replica as the new
 - Use <b>Redis Auth</b> to authenticate to `ElastiCache` for `Redis`
 - `Memcached` supports SASL-based authentication
 
+## FSx
+- Allows us to launch 3rd party high-performance file system on AWS
+- Useful when we don't want to use an AWS managed file system like S3
+- <b>Can be access from your on-premise infrastructure</b>
+
+### FSx for Windows
+- Shared File System for Windows (like EFS but for Windows)
+- Supports <b>SMB</b> protocol, Windows <b>NTFS</b>, Microsoft <b>Active Directory</b> integration, ACLs, users qoutas
+- Built on SSD, scale up to 10s of GB/s, millions IOPS, 100s PB of data
+- Support Multi-AZ (high availability)
+- Data is backed-up daily to S3
+- Does not integrate with S3 (cannot store cold data)
+
+### FSx for Lustre
+- Parallel distributed file system for <b>HPC</b> (like EFS but for HPC)
+- Scales up to 100s GB/s, millions of IOPS, sub-ms latencies
+- <b>Only works with Linux</b>
+- <b>Seamless integration with S3</b>
+  - Can read S3 buckets as a file system (through FSx)
+  - Can write the output back to S3 (through FSx)
+- Ability to both process the <b>hot data</b> in a parallel and distributed fashion as well as easily store the <b>cold data</b> on Amazon `S3`
+
+### FSx Deployment Options
+- <b>Scratch File System</b>
+  - Temporary storage (cheaper)
+  - Data is not replicated (data lost if the file server fails)
+  - High burst (6x faster than persistent file system)
+  - Usage: short-term processing
+- <b>Persistent File System</b>
+  - Long term storage (expensive)
+  - Data is replicated with same AZ
+  - Failed files are replaced within a minutes
+  - Usage: long-term processing, sensitive data
+
 ## Network
 
 ## Messaging
