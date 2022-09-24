@@ -965,6 +965,10 @@ which uses to access the MySQL Database.
 - RDS event only provide operational events on the DB instance (not the data)
 - To capture data modification, events, use <b>native function</b> or <b>store procedures</b> to invoke a `Lambda` function.
 
+### RDS Custom for Oracle and MSSQL Server
+
+### RDS Proxy
+
 
 ### Monitoring
 - `CloudWatch` metrics for RDS
@@ -1026,6 +1030,8 @@ like class(ex, direct internal users to low-capacity instances and direct produc
 > that has the highest priority (lowest tier). If two or more Aurora Replicas share the same tier, then Aurora promotes the replica that is 
 > largest in size. If two or more Aurora Replicas share the same priority and size, then Aurora promotes an arbitary replica in the same promotion tier.
 
+### Backup and Monitoring
+
 ### Encryption & Network Security
 - Encryption at rest using KMS (same as RDS)
 - Encryption in flight using SSL (same as RDS)
@@ -1060,6 +1066,49 @@ if disabled and the master node fails, need to promote a Read Replica as the new
 ### Aurora Events
 - Invoke a `Lambda` function from an Aurora MySQL-compatible DB cluster with a native function or a stored procedure (same as RDS)
 - Used to capture data changes whenever a row is modified.
+
+
+## DynamoDB
+- Serverless NoSQL DB with multi-AZ
+- Distributed Database
+- Not an in-memory database (uses storage devices)
+- Storage auto-scaling
+- <b>Single digit millisecond</b> response time at any scale
+- <b>Maximum size of an item: 400KB</b>
+- Primary key(must be decided at creation) can be a single field or a pair of fields(partition key and sort key)
+- Indexes allow us to query on attributes other than the Primary Key
+- Supports TTL (automatically delete an item after an expiry timestamp)
+- Supports <b>Transactions</b> (either write to multiple tables or write to none)
+
+### Capacity
+- <b>Provisioned Mode</b>
+  - Provision read & write capacity
+  - Pay for the provisioned capacity
+  - Auto-scaling option(e.g set RCU and WCU to 80% and the capacities will be scaled automatically based on the workload)
+- <b>On-demand Mode</b>
+  - Capacity auto-scaling based on the workload
+  - Pay for what you use (more expensive)
+  - Great for unpredictable workloads
+
+### Dynamob DB Accelerator (DAX)
+- Caches the queries and scans of DynamoDB items
+- Solves read congestion (`ProvisionedThroughputExceededException`)
+- <b>Microseconds latency for cached data</b>
+- Doesn't require application code changes
+- 5 minutes TTL for cache (default)
+
+### DynamoDB Streams
+- Ordered stream of notifications of item-level modifications(create/update/delete) in a table 
+- Destination can be 
+  - Kinesis Data Streams
+  - AWS Lambda
+  - Kinesis Client Library application
+- Data Retention for up to 24hours
+
+### Global Tables
+- For low latency access in multiple-regions
+- Applications can READ and WRTIE to the table in any region and the change will automatically be replicated to other tables (<b>active-active cross region replication</b>)
+- <b>Must enable DynamoDB Streams as a pre-requisite</b> 
 
 ## Network
 
