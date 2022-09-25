@@ -987,7 +987,7 @@ which uses to access the MySQL Database.
   - Manually triggered by the user
   - Retention of backup for as long as you want
 
-> Trick: in a stopped RDS database, you will still pay for storage. If you pla on stopping it for a long time, you should snapshot & restore instead
+> Trick: in a stopped RDS database, you will still pay for storage. If you plan on stopping it for a long time, you should snapshot & restore instead
 
 ### RDS Restore
 - Restoring RDS backup or snapshot create a new database
@@ -1214,6 +1214,44 @@ if disabled and the master node fails, need to promote a Read Replica as the new
 - in-flight encryption using SSL
 - Use <b>Redis Auth</b> to authenticate to `ElastiCache` for `Redis`
 - `Memcached` supports SASL-based authentication
+
+## DocumentDB
+- think MongoDB (NoSql database)
+- Similar deployment concept to Aurora
+- Serverless, Fully Managed, High Available with replication across 3AZ
+- Storage automatically increments to 10GB upto 64TB
+- Auto-scale to workload with millions of request per seconds
+
+## Amazon KeySpaces
+- think Apache Cassandra
+- Serverless, Scalable, Fully Managed, High Available by AWS
+- Tables are replicated 3 times across multiple AZ
+- Use Cassandra Query Language (CQL)
+- Capacity
+  - On demand mode
+  - Provisioned mode with autoscaling
+- Encryption, backup, Point in time recovery up to 35 days
+- Usage:
+  - store IoT Devices info, time series data
+
+## Amazon QLDB
+- Quantum Ledger Database
+- Think of a book recording a financial transactions
+- Fully Managed, Serverless, High Available, Replication across 3 AZ by AWS
+- Immutable system: no entry can be removed or modified, `cryptograhically` verifiable
+- 2-3x better performance than a common ledger blockchain frameworks, manipulate data using SQL
+- <b>No Decentralization</b>
+
+## Amazon Timestream
+- Fully managed, fast scalable, serverless time series database
+- Automatic scale up/down to adjust capacity
+- Store and analyze trillions of events per day
+- 1000s times faster & 1/10th cost of a relational database
+- Near realtime analytics
+- Encryption in transit and at rest (same as RDS)
+
+- Usage:
+  - IoT apps, operational applications, real-time analytics
 
 ## FSx
 - Allows us to launch 3rd party high-performance file system on AWS
