@@ -895,7 +895,7 @@ to temporarily access the resource before the URL expires (default 1 hour)
 - Backed by Elastic Compute Cloud `EC2` storage
 - We don't have access to the underlying instance
 - <b>DB Connection is made on port 3306</b>
-- Security Groups are used for network security (must allow incming TCP traffic on port 3306 from specific IPs)
+- Security Groups are used for network security (must allow incoming TCP traffic on port 3306 from specific IPs)
 
 ### Backups
 - <b>Automated Backups</b> (enabled by default)
@@ -916,10 +916,10 @@ to temporarily access the resource before the URL expires (default 1 hour)
 ### Read Replicas
 - Allow us to scale the read operation (SELECT) on RDS
 - Up to 5 read replicas (within AZ, cross AZ or cross region)
-- Asynchronous Relication (seconds)
+- Asynchronous Replication (seconds)
 - Replicas can be promoted to their own DB
 - Applications must update the connection string to leverage read replicas
-- Network fee for repliation
+- Network fee for replication
   - Same region: free
   - Cross region: paid
 
@@ -931,7 +931,7 @@ to temporarily access the resource before the URL expires (default 1 hour)
 - Increase availability of the RDS database by replicating it to another AZ
 - Synchronous Replication
 - Connection string does not require to be updated(both the database can be accessed by one DNS name, 
-which allos for automatic DNS failover to standby database)
+which allows for automatic DNS failover to standby database)
 - When failing over, <b>RDS flips the CNAME</b> record for the DB instance to point at the standby,
 which is in turn promoted to become the new primary
 - <b>Cannot be used for scaling as the standby database cannot take read/write operation</b>.
@@ -944,11 +944,11 @@ which is in turn promoted to become the new primary
   - SSL certificates
   - Force all connections to your DB instance to use SSL by setting the `rds.force_ssl` parameter to `true`
   - To enable encryption in transit, download the <b>AWS-provided root certificates</b> & used them when connecting to DB
-To encrypt an un-encrypted RDS database:
-  - Create a snapshot of the un-encrypted database
-  - Copy the snapshot and enable encryption for the snapshot
-  - Restore the database from the encrypted snapshot
-  - Migrate applications to the new database, and delete the old database
+  - To encrypt an un-encrypted RDS database:
+    - Create a snapshot of the un-encrypted database
+    - Copy the snapshot and enable encryption for the snapshot
+    - Restore the database from the encrypted snapshot
+    - Migrate applications to the new database, and delete the old database
 
 ### Access Management
 - Username and Password can be used to login the database
