@@ -966,9 +966,46 @@ which uses to access the MySQL Database.
 - To capture data modification, events, use <b>native function</b> or <b>store procedures</b> to invoke a `Lambda` function.
 
 ### RDS Custom for Oracle and MSSQL Server
+- Managed Oracle and MSSQL database with OS and database customization
+- RDS: Automates setup, operation and scaling of database in AWS
+  - Entire database and the OS to be managed by AWS
+- Custom: access to the underlying database and OS, so you can:
+  - Configure settings
+  - Install patches
+  - Enable native features
+  - Access underlying EC2 instance using `SSH` or `SSM Session Manager`
+  - Full admin access to the underlying OS and Database
+- <b>De-active automation mode</b> to perfom your customization, better take a DB snapshot before
+
+### RDS Backup
+- Automated backups:
+  - Daily full backup of the database (during the maintenance window)
+  - Transaction logs are backed-up by RDS every 5 minutes
+  - => Ability to restore any point in time (from oldest backup to 5 minutes ago)
+  - 1 to 35 days of retention, set 0 to disabled automated backups
+- Manual DB Snapshots
+  - Manually triggered by the user
+  - Retention of backup for as long as you want
+
+> Trick: in a stopped RDS database, you will still pay for storage. If you pla on stopping it for a long time, you should snapshot & restore instead
+
+### RDS Restore
+- Restoring RDS backup or snapshot create a new database
+- Restoring MySQL RDS database from S3
+  - Create a backup of your on-premise database
+  - Store it on Amazon S3 (object storage)
+  - Restore the backup file onto a new RDS instance running MySql
 
 ### RDS Proxy
-
+- Fully managed database proxy for RDS
+- Supports: MySQL, PostgreSQL, MariaDB and Aurora (MySQL, PostgreSQL)
+- Allows apps to pool and share DB connections established with database
+- Improved database efficiency by reducing the stress on the database resources (CPU, RAM)
+and minimize open connections (and timeouts)
+- Serverless, Autoscaling, Highly available
+- <b>Reduced RDS and Aurora failover time by up to 66%</b>
+- Enforce `IAM Authentication for DB` and securely store credentials in AWS Secret Manager
+- <b>RDS Proxy is never publicly accessible (must be accessed from VPC)</b>
 
 ### Monitoring
 - `CloudWatch` metrics for RDS
@@ -1030,7 +1067,26 @@ like class(ex, direct internal users to low-capacity instances and direct produc
 > that has the highest priority (lowest tier). If two or more Aurora Replicas share the same tier, then Aurora promotes the replica that is 
 > largest in size. If two or more Aurora Replicas share the same priority and size, then Aurora promotes an arbitary replica in the same promotion tier.
 
-### Backup and Monitoring
+### Aurora Backup
+- Automated backups
+  - 1 to 35 days (cannot be disabled)
+  - point in time recovery in that timeframe
+- Manual DB Snapshots
+  - Manually triggered by the user
+  - Retention of backup for as long as you want
+
+### Aurora Restore Options
+- Restoring backup or snapshots create a new database
+- Restoring MySql Aurora cluster from S3
+  - Create a backup of your on-premise database using `Percona XtraBackup`
+  - Store the backup file on Amazon S3
+  - Restore the `S3` backup file onto a new Aurora cluster running MySQL 
+
+### Aurora Database Cloning
+- Create a new Aurora DB Cluster from an existing one
+- Faster than snapshot & restore
+- DB cluster uses the same cluster volume and data as the original but will change when data updates are made
+- <b>Useful to create a staging database from a production database</b>
 
 ### Encryption & Network Security
 - Encryption at rest using KMS (same as RDS)
@@ -1067,6 +1123,18 @@ if disabled and the master node fails, need to promote a Read Replica as the new
 - Invoke a `Lambda` function from an Aurora MySQL-compatible DB cluster with a native function or a stored procedure (same as RDS)
 - Used to capture data changes whenever a row is modified.
 
+
+### RDS & Aurora Security
+- <b>At-rest encryption</b>:
+  - Database master & replicas encryption using AWS-KMS - must be defined as launch time
+  - If the master is not encrypted, the read replicas cannot be encrypted
+  - To encrypt an un-encrypted database, go-through a DB snapshot & restore as encrypted
+- <b>In-flight encryption</b>:
+  - TLS-ready by default, use the AWSTLS root certificates client-side
+- <b>IAM Authentication</b>: to connect to your database (instead of username/password)
+- <b>Security Groups</b>: Control Network access to your RDS / Aurora DB
+- <b>No SSH Available</b> except on RDS Custom
+- <b>Audit logs can be enabled</b> and sent to `CloudWatch Logs` for longer retention
 
 ## DynamoDB
 - Serverless NoSQL DB with multi-AZ
