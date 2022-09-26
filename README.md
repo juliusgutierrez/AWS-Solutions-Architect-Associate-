@@ -1287,6 +1287,69 @@ if disabled and the master node fails, need to promote a Read Replica as the new
   - Failed files are replaced within a minutes
   - Usage: long-term processing, sensitive data
 
+## RedShift
+- AWS managed data warehouse (10x better performance than other data warehouse)
+- Based on <b>PostgreSQL</b>
+- Used for <b>Online Analytical Processing (OLAP) and high performing querying</b>
+- <b>Columnar storage</b> of data with massively parallel query execution in SQL
+- Faster querying than `Athena` due to indexes
+- Can be used for both long complex queries as well as short fast queries
+- Need to provision instances as a part of the Redshift cluster (pay for the instances provisioned)
+- Integrated with <b>Business Intelligence (BI) tools</b> such as `QuickSight` or `Tableau`
+- Redshift cluster can have 1 to 128 nodes (128TB per node)
+  - <b>Leader Node</b>: query planning & result aggregation
+  - <b>Compute Nodes</b>: execute queries & send the result to leader node
+- <b>No multi AZ support</b> (all the nodes will be in the same AZ)
+- Auto healing feature
+
+### Loading data into RedShift
+- <b>S3</b>
+  - Use `COPY` command to load data from an S3 bucket into Redshift
+  - Without enhanced VPC routing
+    - data goes through the public internet
+  - Enhanced VPC routing
+    - data goes through the VPC without traversing the public internet
+- <b>Kinesis Data Firehose</b>
+  - Send data to S3 and issues a `COPY` command to load it into Redshift
+- <b>EC2 Instance</b>
+  - Using JDBC driver
+  - Used when an application needs to write data to Redshift
+  - Optimal to write data in batches
+
+### Snapshots
+- Stored internally in `S3`
+- Incremental (only changes are saved)
+- Can be restored into a new Redshift cluster
+- Automated
+  - based on a schedule or storage size (every 5GB)
+  - set retention
+- Manual
+  - retains until you delete them
+- Feature to <b>automatically copy snapshots into another region</b>
+
+### RedShift Spectrum
+- Query data present in S3 without loading it into Redshift
+- Need to have a Redshift cluster to use this feature
+- Query is executed by 1000s of Redshift Spectrum nodes
+- Consumes much less of your cluster's processing capacity than other queries
+
+## Neptune
+- AWS Managed graph database
+- Used for high relationship data (e.g networking)
+- Highly available access 3 AZ with up to 15 read replicas
+- Point in time recovery due to continuous backup to S3
+- Support for KMS encryption at rest + HTTPS for inflight encryption
+- <b>Need to provision nodes in advance</b> (pay for the provisioned nodes)
+
+## ElasticSearch
+- Used in combination with a database to perform <b>search operations on the database</b>
+- Can search on any field, even supports <b>partial matches</b>
+- <b>Need to provision a cluster of instances</b> (pay for provisioned instances)
+- Supports <b>Multi-AZ</b>
+- Used in Big data
+- Comes with <b>Kibana</b> (virtualization) & <b>Logstash</b> (log ingestion) - ELK stack
+- Integrated with `Cognito` for access control
+
 ## Network
 
 ## Messaging
