@@ -304,7 +304,7 @@ ___
     - Disabled by default
     - No charges for inter AZ data
   - Application Load Balancer
-    - Always on (can't disabled
+    - Always on (can't disabled)
     - No charges for inter AZ data
   - Network Load Balancer
     - Disabled by default
@@ -489,7 +489,7 @@ in that edge location to perform some operation like fetching data from `DynamoD
 - Features: sequence, parallel, conditions, timeouts, error handling. etc
 - Provides a <b>visual graph</b> showing the current state and which path workflow has taken
 
-### Simple Wroklow Service (SWF)
+### Simple Wrokflow Service (SWF)
 - Outdated service (step functions are preferred instead)
 - Code runs on EC2 (not serverless)
 - <b>Ensures that a task is never duplicated</b> (could replace standard SQS queues)
@@ -860,6 +860,9 @@ to temporarily access the resource before the URL expires (default 1 hour)
 - Glacier Vault Lock
   - WORM (Write Once Read Many) model for Glacier
   - For compliance and data retention
+- Legal Hold
+  - allow you to prevent an objects and its version from being overwritten or deleted indefinitely.
+  - give you the ability to remove it manually
 
 ### Access Points
 - Each `Access Point` gets it own DNS policy to limit who can access it
