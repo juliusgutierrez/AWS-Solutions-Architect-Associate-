@@ -1355,6 +1355,102 @@ if disabled and the master node fails, need to promote a Read Replica as the new
 
 ## Network
 
+## Route 53
+- Global Service
+- AWS managed <b>Authoritative DNS</b> (customer can be update the DNS records and have full control over the DNS)
+- A `Domain Registrar` (for registering domain names)
+- Only AWS service which provides 100% availability SLA
+- Affected by client's DNS caching (not suitable for Blue Green Deployment if the client caches DNS queries)
+
+> It is recommended to use DNS names or URLs instead of IPs wherever possible
+
+### Hosted Zone
+- A container for DNS records that define how to route traffic to a domain and its subdomains
+- Hosted zone is a queried to get the IP address from the hostname
+- Types:
+  - Public Hosted Zone:
+    - resolves public domain names
+    - can be queried by anyone on the internet
+  - Private Hosted Zone
+    - resolves private domain names
+    - can only be queried from within the VPC
+
+### Record Types
+- <b>A</b> - maps a hostname to IPv4
+- <b>AAAA</b> - maps a hostname to IPv6
+- <b>CNAME</b> - maps a hostname to another hostname
+  - Target is a domain name which must have an A or AAAA record
+  - <b>Cannot point to root domain (Zone Apex)</b> Ex: you can't create a CNAME record for `example.com` but you can create for `something.example.com`
+- <b>NS</b> (Name Server) - control how traffic is routed for a domain
+- <b>Alias</b> - maps a hostname to an AWS resource
+  - <b>AWS proprietary</b>
+  - Can point to root (zone apex) and non-root domains
+  - <b>Alias Record is of type A or AAAA (IPv4 / IPv6)</b>
+  - Targets can be
+    - Elastic Load Balancer (ELB)
+    - CloudFront Distributions 
+    - API Gateway
+    - Elastic Beanstalk environments
+    - S3 Websites
+    - VPC Interfaces Endpoints
+    - Global Accelerator 
+    - Route 53 record in the same hosted zone
+  - <b>Target cannot be EC2</b>
+
+### Routing Policies
+- <b>Simple</b>
+  - Route to one or more resources
+  - if multiple values are returned. client chooses one at random (client-side load balancing)
+  - No health check (if returning multiple resources, some of them might be unhealthy)
+- <b>Weighted</b>
+  - Route a fraction of request to multiple resources
+  - Health checks 
+  - Use Case: testing a new application version by sending a small amount of traffic
+  - Can be used for <b>Active-Active failover</b> strategy
+- <b>Latency Based</b>
+  - Redirect to the resource that has the lowest latency
+  - Health checks
+  - Can be used for <b>Active-Active failover</b> strategy
+- <b>Geolocation</b>
+  - Routing based on the client's location
+  - Should create a `Default` record (in case there's no match on location)
+  - Use cases: restrict content distribution & language preference
+- <b>Geoproximity</b>
+  - Route traffic to your resources based on the proximity of clients to the resources
+  - Ability to shift more traffic to resources based on the defined bias.
+    - To expand (bias: 1 to 99) -> more traffic to the resource
+    - to shrink (bias: -1 to -99) -> less traffic to the resource
+  - Uses <b>Route 53 traffic flow</b>
+- <b>Multi value</b>
+  - Route traffic to multiple resources (max 8)
+  - Health checks (only healthy resources will be returned)
+
+### Health Checks
+- HTTPS health checks are only for public resources
+- Allows for automated DNS failover
+- Types
+  - Monitor an endpoint (application or other AWS resource)
+    - Multiple global health checkers check the endpoint health
+    - Must configure the application firewall to allow incoming requests from the IPs of Route 53 Health Checkers
+    - Supported protocols: HTTP, HTTPS and TCP
+  - Monitor other health checks (<b>Calculated health checks</b>)
+    - Combine the results of multiple health checks into one (AND or NOT)
+    - Specify how many of the health checks need to pass to make the parent pass
+    - Usage: perform maintenance to your website without causing all health checks to fail
+  - Monitor Cloudwatch alarms (to perform health check on private resources)
+    - Route 53 health checkers are outside the VPC. They can't access private endpoints (private VPC or on-premises resources)
+    - Create a `CloudWatch` metric and associate a `CloudWatch Alarm` to it, then create a health check that checks the `CW` alarm
+
+### GoDaddy with Route 53
+- Use GoDaddy as registrar and route 53 as DNS
+  - Once we register a hostname at GoDaddy, we need to update the name server(NS) of `GoDaddy` to match the name servers of a public hosted zone created
+in `Route 53`. This way, `GoDaddy` will use the `Route 53`'s DNS
+
+### DNS Resolution in Hybrid Cloud
+- To resolved DNS queries for resources in the VPC from the on-premises network, create an inbound endpoint on `Route 53 Resolver` and then DNS resolvers on the on-promise network
+can forward DNS queries to Route 53 Resolver vai this endpoint.
+- To resolve DNS queries for resources in the on-premises network from the VPC, create an outbound endpoint on Route 53 Resolver and then Route 53 Resolver can conditionally forward queries to resolvers on the on-premises network via this endpoint. To conditionally forward queries, create Resolver rules that specify the domain names for the DNS queries that you want to forward (such as example.com) and the IP addresses of the DNS resolvers on the on-premises network that you want to forward the queries to.
+
 ## Messaging
 
 ## Data Migration & Sync
