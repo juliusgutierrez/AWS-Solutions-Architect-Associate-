@@ -1493,7 +1493,7 @@ if the user should be allowed to access the resource.
   in the header to API gateway. API gateway validates the token using Cognito and then hits the backend if the token is valid.
 
 ### Serverless CRUD application
-![](/images/api_gateway_serverless_crud.png "serverless crud diagram")
+![](images/api_gateway_serverless_crud.png "serverless crud diagram")
 
 ## Virtual Private Cloud (VPC)
 - Soft limit of 5 VPCs per region
@@ -1504,7 +1504,7 @@ if the user should be allowed to access the resource.
 
 ### Classless Inter-Domain Routing (CIDR)
 - Way to define a range of IP addresses
-  ![](/images/vpc_submask.png "ip addresses")
+  ![](images/vpc_submask.png "ip addresses")
 - Two parts
   - Base IP - 192.168.0.0
   - Subnet Mask (defines how many bits are frozen from the left side) - /16
@@ -1537,6 +1537,52 @@ if the user should be allowed to access the resource.
 > IGW performs network address translation (NAT) for a public EC2 instance
 
 ### Bastion Host 
+- EC2 instance running in the public subnet (accessible from public internet), to allow users to SSH into the instances in the private subnet
+- Security groups of the private instances should only traffic from the bastion host
+- Bastion host should only port 22 traffic from the IP address you need (<b>small instances are enough</b>)
+
+- <b>High Availability</b>
+  - HA options for Bastion Host
+    - Run 2 Bastion host across 2 AZ
+    - Run 1 Bastion host across 2 AZ with ASG 1:1:1
+  - Routing to the bastion host
+    - if 1 bastion host, use an elastic IP with EC2 user data script to access it.
+    - If 2 bastion host, use a public facing NLB (layer 4) deployed in multiple AZ. Bastion host can live in the private subnet (more secure)
+  - Can't use ALB as it works in layer 7 (HTTP protocol) and SSH works with TCP
+
+![](images/vpc_bastion_host.png)
+
+### Network Address Translation (NAT) Instance
+- An `EC2` instance **launched in the public subnet** which allows EC2 instances in private subnets to connect to the Internet without being connected from the internet (blocks inbound connection)
+- Must disable EC2 settings: source / destination IP check on the NAT instance as the IPs can change.
+- <b>Must have an Elastic IP attached to it</b>
+- `Route Tables` for private subnets must be configured to route internet-destined traffic to the NAT instance (its elastic IP)
+- <b>Can be used as a Bastion Host</b>
+- Disadvantages:
+  - Not hightly available or resilient out of the box. Need to create an ASG in multi-AZ + resilient user data script
+  - Internet traffic bandwidth depends on EC2 Instance type
+  - You must manage `Security Groups` & rules:
+    - Inbound:
+      - Allow HTTP / HTTPS traffic coming from Private Subnets
+      - Allow SSH from your home network (access is provided through Internet Gateway `IGW`)
+    - Outbound: 
+      - Allow HTTP / HTTPS traffic to the internet
+
+![](images/vpc_nat_instance.png)
+
+### NAT Gateway
+- AWS managed NAT with <b>bandwidth autoscaling</b> (up to 45Gbps)
+- Preferred over NAT instances
+- <b>Uses an Elastic IP</b> behind the scenes
+- Bound to an AZ
+- Cannot be used by EC2 instance in the same subnet (only from other subnets)
+- Cannot be used as a bastion host
+- `Route Tables` for private subnets must be configured to route internet destined traffic to the NAT Gateway
+- No Security groups to manage
+- Pay pey hour
+
+![](images/vpc_nat_gateway.png)
+
 
 ## Messaging
 
