@@ -1451,6 +1451,50 @@ in `Route 53`. This way, `GoDaddy` will use the `Route 53`'s DNS
 can forward DNS queries to Route 53 Resolver vai this endpoint.
 - To resolve DNS queries for resources in the on-premises network from the VPC, create an outbound endpoint on Route 53 Resolver and then Route 53 Resolver can conditionally forward queries to resolvers on the on-premises network via this endpoint. To conditionally forward queries, create Resolver rules that specify the domain names for the DNS queries that you want to forward (such as example.com) and the IP addresses of the DNS resolvers on the on-premises network that you want to forward the queries to.
 
+## API Gateway
+- Serverless REST APIs
+- Invoke Lambda function using REST APIs (API gateway will proxy the request to lambda)
+- Supports <b>Websocket</b> (stateful)
+- Rate limiting (throttle request) - returns <b>429 Too Many Requests</b>
+- Cache API responses
+- Transform and validate request and responses
+- <b>Can be integrated with any HTTP endpoint in the backed or any AWS API</b>
+> - We can use an API Gateway REST API to directly access a DynamoDB table by creating a proxy for the DynamoDB query API
+> - API cache is not enabled for a method, it is enabled for a stage
+
+### Endpoints Types
+- <b>Edge-Optimized</b>(default)
+  - For global clients
+  - Requests are routed through the `CloudFront` edge location (improves latency)
+  - The API Gateway lives in only one region but it is accessible efficiently through edge locations
+- <b>Regional</b>
+  - For clients within the same region
+  - Could manually combine with your own `CloudFront` distribution for global deployment
+    (this way you will have more control over the caching strategies and the distributions)
+- <b>Private</b>
+  - Can only be accessed within your VPC using an <b>Interface VPC endpoint (ENI)</b>
+  - Use resource policy to define access
+
+### Access Management
+- <b>IAM Policy</b>
+  - Create an IAM policy and attach to User or Role to allow it to call an API
+  - Good to provide <b>access within your own AWS account</b>
+  - Leverages <b>Sig v4</b> where IAM credential are in the request headers
+
+- <b>Lambda Authorizer</b>
+  - Uses a `Lambda` function to validate the token being passed in the header and return an IAM policy to determine
+if the user should be allowed to access the resource.
+  - Option to cache result of authentication
+  - for <b>OATH / SAML / 3rd party type of authentication</b>
+  - Good to provide access outside your AWS account if you have an <b>existing IDP</b>
+- <b>Cognito User Pools (CUP)</b>
+  - <b>Seamless integration with CUP</b> (no custom lambda implementation required)
+  - The client (user) first authentication with Cognito and gests the access token which it passes
+  in the header to API gateway. API gateway validates the token using Cognito and then hits the backend if the token is valid.
+
+### Serverless CRUD application
+![](/images/api_gateway_serverless_crud.png "serverless crud diagram")
+
 ## Messaging
 
 ## Data Migration & Sync
