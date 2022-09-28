@@ -1495,6 +1495,49 @@ if the user should be allowed to access the resource.
 ### Serverless CRUD application
 ![](/images/api_gateway_serverless_crud.png "serverless crud diagram")
 
+## Virtual Private Cloud (VPC)
+- Soft limit of 5 VPCs per region
+- Only the Private IPv4 ranges are allowed
+- AWS accounts have a default VPC
+- Default VPC has internet connectivity and all EC2 instances inside it have public IPv4 addresses and public and a private IPv4 DNS names
+> - New EC2 instances are launched into the default VPC if no subnet is specified
+
+### Classless Inter-Domain Routing (CIDR)
+- Way to define a range of IP addresses
+  ![](/images/vpc_submask.png "ip addresses")
+- Two parts
+  - Base IP - 192.168.0.0
+  - Subnet Mask (defines how many bits are frozen from the left side) - /16
+- Private IP ranges:
+  - 10.0.0.0 - 10.255.255.255 (10.0.0.0/8) -> used in big networks (24 bits can change)
+  - 172.16.0.0 - 172.31.255.255 (172.16.0.0/12) -> AWS default VPC
+  - 192.168.0.0 - 192.168.255.255 (192.168.0.0/16) -> home networks
+- Rest of the IP ranges are Public
+- <b>Max 5 CIDR ver VPC</b>
+  - Min.size is /28 (16 IP addresses)
+  - Max.size is /16 (65536 IP addresses)
+  
+### Subnet
+- Sub-ranges of IP addresses within the VPC
+- <b>each subnet is bound to an AZ</b>
+- Subnets in a VPC cannot have overlapping CIDRs
+- <b>AWS reserves 5 IP addresses (first 4 and last 1 in each subnet</b>. These 5 IP addresses are not available for use. 
+  - Example: If CIDR block 10.0.0.0/24, then IP addresses are 10.0.0.0, 10.0.0.1, 10.0.0.2, 10.0.0.3 & 10.0.0.255
+
+> To make the EC2 instances running in private subnets accessible on the internet, place them behind an internet facing (running in public subnets) Elastic Load Balancer.
+> 
+> Public subnets are subnets that have: - Auto-assign public IPv4 address set to `Yes` the subnet route table has an attached Internet Gateway
+>
+### Internet Gateway (IGW)
+- Allows resources in a VPC to connect to the internet
+- Should be used to connect public resources to the internet (use NAT gateway for private resources)
+- Route table of the public subnets must be edited to allow requests destined outside the VPC to be routed to the `IGW`
+- One IGW per VPC
+
+> IGW performs network address translation (NAT) for a public EC2 instance
+
+### Bastion Host 
+
 ## Messaging
 
 ## Data Migration & Sync
