@@ -1589,6 +1589,12 @@ if the user should be allowed to access the resource.
 
 ![](images/voc_ha.png)
 
+> ### Gateway or Interface Endpoint for S3?
+> Gateway is most likely going to be preferred all the time in the exam.
+> Cost: free for Gateway, $ for interface endpoint
+> Interface Endpoint is preferred access is required from onpremise (Site to Site VPN or direct Connect),
+> a different VPC or a different region
+
 ### DNS Resolution in VPC
 - Two settings need to be enabled to allow DNS resolution within a VPC:
   - <b>DNS Support</b>
@@ -1635,6 +1641,50 @@ if the user should be allowed to access the resource.
 > - VPC Peering does not facilitate centrally managed VPC like `VPC Sharing`
 
 ### VPC Endpoints
+- <b>Private endpoints</b> within your VPC that allow AWS services to privately connect to resources within your VPC without traversing the public internet (cheaper)
+- Powered by `AWS PrivateLink`
+- Route table is updated automatically
+- <b>Bound to a region</b> (do not support inter-region communication)
+- Two types:
+  - <b>Interface Endpoint</b>
+    - Provisions san `ENI` (private IP) as an entry point per subnet
+    - Need to <b>attached a security group to the interface endpoint</b> to control access
+  - <b>Gateway Endpoint</b>
+    - Provisions a gateway
+    - Must be used as a target in a route table
+    - Supports only <b>S3</b> and <b>DynamoDB</b>
+
+### VPC Flow Logs 
+- Captures information about <b>IP traffic</b> going into your <b>interfaces</b>
+- Three levels:
+  - <b>VPC</b> flow logs
+  - <b>Subnet</b> flow logs
+  - <b>ENI</b> flow logs
+- Can be configured to show accepted, rejected or all traffic
+- Flow logs data can be sent to <b>S3</b> (bulk analytics) or `CloudWatch` Logs (near real-time decision-making)
+- Query VPC flow logs using `Athena` in S3 or `CloudWatch Logs Insights`
+- Captures network information from AWS managed interfaces too: ELB, RDS, ElastiCache, Redshift, Workspaces, NATGW, Transit Gateway...
+
+### IPv6 Support
+- IPv4 cannot be disabled for your VPC
+- Enable IPv6 to operate in <b>dual-stack mode</b> in which your EC2 instances will get at least a <b>private IPv4</b> and a <b>public IPv6</b>. 
+They can communicate using either IPv4 or IPv6 to the internet through an Internet Gateway
+- If you cannot launch an EC2 instance in your subnet, Its not because it cannot acquire an IPv6 (the space is very large).
+It's because there are no available IPv4 in you subnet.
+<b>Solution: create a new IPv4 CIDR in your subnet</b>
+
+### Egress-only Internet Gateway
+- Allow instances in your VPC to initiate outbound connections over IPv6 while preventing inbound IPv6 connections to your private instances 
+- Similar to `NAT Gateway` but for IPv6
+- Must update `Route table`
+
+> ### VPC Console Wizard
+> - Supported configurations:
+> - VPC with a single public subnet
+> - VPC with public and private subnets (NAT)
+> - VPC with public and private subnets and AWS Site to Site VPN access
+> - VPC with a private subnet only and AWS Site to Site VPN access
+
 
 ## Messaging
 
