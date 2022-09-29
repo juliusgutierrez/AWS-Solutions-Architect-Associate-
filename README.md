@@ -1583,6 +1583,29 @@ if the user should be allowed to access the resource.
 
 ![](images/vpc_nat_gateway.png)
 
+- High Availability
+  - Create NAT Gateways in public subnets bound to different AZ all routing outbound connections to the IGW (attached to the VPC)
+  - No cross AZ failover needed because if an AZ goes down, all the instances in that AZ also go down
+
+![](images/voc_ha.png)
+
+### DNS Resolution in VPC
+- Two settings need to be enabled to allow DNS resolution within a VPC:
+  - <b>DNS Support</b>
+    - Allows the resources within the VPC to query the DNS provided by Route 53 Resolver
+    - <b>Enabled by default</b>
+    - If disabled, we need to provide a custom DNS server otherwise we won't be able to reach hostnames
+  - <b>DNS Hostnames (enableDnsHostnames)</b>
+    - Assigns <b>public hostname</b> to EC2 instances in our VPC if they have a public IPv4
+    - <b>Doesn't work until</b> `enableDnsSupport=true`
+    - By default: 
+      - Default VPC - Enabled
+      - Custom VPC - Disabled
+    - When disabled, instances in the VPC will have a public IP but no public DNS
+- If you use custom domain names in a private hosted zone in Route 53, you must enable both of these settings
+
+![](images/vpc_dns_hostnames.png)
+
 
 ## Messaging
 
