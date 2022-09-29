@@ -1606,6 +1606,35 @@ if the user should be allowed to access the resource.
 
 ![](images/vpc_dns_hostnames.png)
 
+### Network Access Control List (NACL)
+- NACL are a firewall at the subnet level
+- One NACL per subnet but a NACL can be attached to multiple subnets
+- New Subnets are assigned the Default NACL
+- Default NACL allows all inboard & outbound requests
+- NACL Rules
+  - Rules number: 1-32777 (lower number has higher precedence)
+  - First rule match will drive the decision
+  - The last rule denies the request (only when no previous rule matches)
+- Security Group:
+  - Firewall for EC2 instances
+  - Support only Allow rules
+  - Stateful (only request will be evaluated against the SG rules)
+  - All rules are evaluated
+- NACL with Ephemeral Ports
+  - In the example below, the client EC2 instance needs to connect to DB instance. Since the ephemeral port can be randomly assigned from a range of ports, the Web Subnets’s NACL must allow inbound traffic from that range of ports and similarly DB Subnet’s NACL must allow outbound traffic on the same range of ports.
+
+![](images/vpc_nacl_ephemeral_ports.png)
+
+### VPC Peering
+- Connect two VPCs (could be in different region or account) using AWS private network
+- Participating VPC must have <b>non-overlapping CIDR</b>
+- VPC peering connection is <b>non-transitive</b> (A-B, B-C != A-C)
+- Must update route tables in each VPC's subnet to ensure request destined to the peered VPC can be routed through the peering connection
+- You can reference a security group in a peered VPC across account or region. This allows us to use SG instead of CIDR when configuring rules.
+
+> - VPC Peering does not facilitate centrally managed VPC like `VPC Sharing`
+
+### VPC Endpoints
 
 ## Messaging
 
