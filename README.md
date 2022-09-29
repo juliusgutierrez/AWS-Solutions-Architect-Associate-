@@ -1559,7 +1559,7 @@ if the user should be allowed to access the resource.
 - `Route Tables` for private subnets must be configured to route internet-destined traffic to the NAT instance (its elastic IP)
 - <b>Can be used as a Bastion Host</b>
 - Disadvantages:
-  - Not hightly available or resilient out of the box. Need to create an ASG in multi-AZ + resilient user data script
+  - Not highly available or resilient out of the box. Need to create an ASG in multi-AZ + resilient user data script
   - Internet traffic bandwidth depends on EC2 Instance type
   - You must manage `Security Groups` & rules:
     - Inbound:
@@ -1685,6 +1685,74 @@ It's because there are no available IPv4 in you subnet.
 > - VPC with public and private subnets and AWS Site to Site VPN access
 > - VPC with a private subnet only and AWS Site to Site VPN access
 
+## PrivateLink
+- Used to expose services in one VPC to multiple other VPCs, possibly in different accounts
+- Should not use VPC peering as we only want to expose a few services
+- Requires a `NLB` (common) or `GWLB` in the service VPC and ENI in the consumer VPC
+- Use multi-AZ NLB and ENIs in multiple AZ for fault-tolerance
+
+![](images/vpc_privatelink.png)
+
+### Exposing ECS task
+- ECS tasks require an ALB. So, we can connect the ALB to the NLB for PrivateLink.
+- Corporate Data Centers will still connect through the VPN or Direct Connect.
+
+![](images/vpc_ecs_task_expose.png)
+
+## Site to Site VPN
+- Easiest and most cost-effective way to connect a VPC to an on-premise data center
+- **IPSec Encrypted** connection through the public internet
+- **Virtual Private Gateway (VGW)**: VPN concentrator on the VPC side of the VPN connection
+- **Customer Gateway (CGW)**: Software application or physical device on customer side of the VPN connection
+If you need to ping EC2 instances from on-premises, make sure you add the ICMP protocol on the inbound rules of your security groups
+
+![](images/vpc_site2site.png)
+
+## VPN Cloudhub
+- **Low-cost hub-and-spoke model for network connectivity between a VPC and multiple on-premise data centers**
+- Every participating network can communicate with one another through the VPN connection
+
+![](images/vpc_vpn_cloudhub.png)
+
+## Direct Connect (DX)
+- Dedicated private connection from an on-premise data center to a VPC
+
+- ![](images/vpc_direct_connect.png)
+
+- **Data in transit is not-encrypted** but the connection is private (secure)
+- More stable and secure than Site-to-Site VPN
+- Access public & private resources on the same connection using Public & `Private Virtual Interface (VIF)` respectively
+- Connection to a data center is made from a Direct Connect Location
+- Connects to a `Virtual Private Gateway (VGW)` on the VPC end
+- Supports both IPv4 and IPv6
+- Supports Hybrid Environments (on premises + cloud)
+- **Lead time > 1 month* to establish a new connection
+
+### Connection Types
+- Dedicated Connection
+  - 1 Gbps and 10 Gbps, 100 Gbps (fixed capacity)
+  - Physical ethernet port dedicated to a customer
+- Hosted Connection
+  - **50Mbps, 500 Mbps, up to 10 Gbps**
+  - On-demand capacity scaling (more flexible than dedicated connection)
+
+### Encryption
+- For encryption in flight, use AWS Direct Connect + VPN which provides an **IPsec-encrypted private connection**
+- Good for an extra level of security
+
+### Resiliency
+- **Recommended**
+![](images/vpc_direct_connect_resiliency.png)
+
+- **Cost-effective way** (VPN connection as a backup)
+  - Implement an `IPSec VPN connection` and use the same `BGP prefix`. Both the Direct Connect connection and IPSec VPN are active and being advertised using the `Border Gateway Protocol (BGP)`. 
+  - The *Direct Connect link will always be preferred* unless it is unavailable.
+
+### Direct Connect Gateway
+- Used to setup a Direct Connect to multiple VPCs, possibly in **different regions but same account**
+- Using DX, we will create a Private VIF to the Direct Connect Gateway which will extend the VIF to Virtual Private Gateways in multiple VPCs (possibly across regions).
+
+![](images/vpc_direct_connect_gateway.png)
 
 ## Messaging
 
