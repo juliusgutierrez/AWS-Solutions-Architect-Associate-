@@ -1706,6 +1706,8 @@ It's because there are no available IPv4 in you subnet.
 - **Customer Gateway (CGW)**: Software application or physical device on customer side of the VPN connection
 If you need to ping EC2 instances from on-premises, make sure you add the ICMP protocol on the inbound rules of your security groups
 
+> Incase Direct Connect fails, you can set up a backup Direct Connect connection (expensive) or a Site to Site VPN connection (cheaper))
+
 ![](images/vpc_site2site.png)
 
 ## VPN Cloudhub
@@ -1822,6 +1824,21 @@ Share Transit Gateway across accounts using Resource Access Manager (RAM) connec
 - Use cases: content inspection, threat monitoring, troubleshooting, etc.
 
 ![](images/vpc_traffic_mirroring.png)
+
+## AWS Network firewall
+- Protect the VPC
+- Layer 3 to Layer 7 protection
+- Can inspect any direction (inbound/outbound)
+  - VPC to VPC traffic
+  - Inbound/Outbound to internet
+  - Direct Connect & Site to Site VPN
+- Internally uses AWS Gateway Load Balancer
+- Rules can be centralize to `AWS Firewall MAanger` to apply to many VPC
+- Traffic filtering: **Allow, drop, alert for the traffic that matches the rules**
+- **Active flow inspection** to protect against network threats with intrusion-prevention capabilities 
+- Send logs that matches to `S3`, `CloudWatch Logs`, `Kinesis Data Firehose`
+![](images/vpc_network_firewall.png)
+
 
 ## Messaging
 
