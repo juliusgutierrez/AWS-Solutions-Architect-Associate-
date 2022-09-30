@@ -1754,6 +1754,75 @@ If you need to ping EC2 instances from on-premises, make sure you add the ICMP p
 
 ![](images/vpc_direct_connect_gateway.png)
 
+## Transit Gateway
+- **Transitive peering** between thousands of VPCs and on-premise data centers using hub-and-spoke (star) topology
+- Works with **Direct Connect Gateway, VPN Connection** and **VPC**
+- **Bound to a region**
+- Transitive peering between VPCs in **same region & account**
+- Route Tables to control communication within the transitive network
+- Supports **IP Multicast** (not supported by any other AWS service)
+
+![](images/vpc_site2site_transit_gw.png)
+
+### Increasing BW of Site-to-Site VPN connection
+- **ECMP** (equal-cost multi-path) routing is a routing strategy to allow to forward a packet over multiple best path
+- To increase the bandwidth of the connection between Transit Gateway and corporate data center, create multiple site-to-site VPN connections, each with 2 tunnels (2 x 1.25 = 2.5 Gbps per VPN connection).
+- Only one VPN connection to a VPC having 2 tunnels out of which only 1 is used (1.25 Gbps)
+
+![](images/vpc_site2site_ecmp.png)
+
+### Share DX between multiple Accounts
+Share Transit Gateway across accounts using Resource Access Manager (RAM) connection between VPCs in the same region but different accounts
+
+![](images/vpc_site2site_shared_transit_gw_.png)
+
+## Networking Cost
+- Inter-AZ and Inter-Region Networking
+  - Traffic entering the AWS is free
+  - Use Private IP instead of Public IP for good savings and better network performance
+  - Traffic leaving an AWS region is paid
+  - Use same AZ for maximum savings (at the cost of availability)
+
+### Minimizing Egress Traffic
+- Try to keep as much internet traffic within AWS to minimize costs
+- Direct Connect location that are co-located in the same AWS Region result in lower cost for egress network
+
+![](images/vpc_egress_cost.png)
+
+### S3 Data Transfer
+- S3 ingress (uploading to S3): free
+- S3 to Internet: $0.09 per GB
+- S3 Transfer Acceleration:
+  - Additional cost on top of Data Transfer (+$0.04 to $0.08 per GB)
+- S3 to CloudFront: free (internal network)
+- CloudFront to Internet: $0.085 per GB (slightly cheaper than S3)
+  - Caching capability (lower latency)
+  - Reduced costs of S3 Requests (cheaper than just S3)
+- S3 Cross Region Replication: $0.02 per GB
+
+![](images/vpc_s3_data_transfer_cost.png)
+
+## Reachability Analyzer
+- A network diagnostics tool that troubleshoots network connectivity between two endpoints in your VPC
+- It builds a model of the network configuration, then checks the reachability based on these configurations (**doesn't send packets, just tests the configurations**)
+- When the destination is:
+  - Reachable - it produces hop-by-hop details of the virtual network path
+  - Not reachable - it identifies the blocking components (e.g. configuration issues In SGs, NACLs, Route Tables, etc.)
+- Use cases:
+  - Troubleshoot connectivity issues
+  - Ensure network configuration is as intended
+
+## Traffic Mirroring
+- Capture and inspect network traffic in your VPC without disturbing the normal flow of traffic
+- Inbound and outbound traffic through ENIs (eg. attached to EC2 instances) will be mirrored to the destination (NLB) for inspection without affecting the original traffic.
+- Capture the traffic
+  - From (Source) ENIs
+  - To (Targets) an `ENI` or `NLB`
+- Source and Target can be in the same or different VPCs (**VPC Peering**)
+- Use cases: content inspection, threat monitoring, troubleshooting, etc.
+
+![](images/vpc_traffic_mirroring.png)
+
 ## Messaging
 
 ## Data Migration & Sync
