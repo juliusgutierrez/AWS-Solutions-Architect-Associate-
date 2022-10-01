@@ -1161,7 +1161,7 @@ if disabled and the master node fails, need to promote a Read Replica as the new
   - Pay for what you use (more expensive)
   - Great for unpredictable workloads
 
-### Dynamob DB Accelerator (DAX)
+### DynamoDB Accelerator (DAX)
 - Caches the queries and scans of DynamoDB items
 - Solves read congestion (`ProvisionedThroughputExceededException`)
 - <b>Microseconds latency for cached data</b>
@@ -1357,7 +1357,7 @@ if disabled and the master node fails, need to promote a Read Replica as the new
 
 ## Route 53
 - Global Service
-- AWS managed <b>Authoritative DNS</b> (customer can be update the DNS records and have full control over the DNS)
+- AWS managed <b>Authoritative DNS</b> (customer can update the DNS records and have full control over the DNS)
 - A `Domain Registrar` (for registering domain names)
 - Only AWS service which provides 100% availability SLA
 - Affected by client's DNS caching (not suitable for Blue Green Deployment if the client caches DNS queries)
@@ -1366,7 +1366,7 @@ if disabled and the master node fails, need to promote a Read Replica as the new
 
 ### Hosted Zone
 - A container for DNS records that define how to route traffic to a domain and its subdomains
-- Hosted zone is a queried to get the IP address from the hostname
+- Hosted zone is queried to get the IP address from the hostname
 - Types:
   - Public Hosted Zone:
     - resolves public domain names
