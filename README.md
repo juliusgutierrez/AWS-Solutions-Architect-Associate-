@@ -1448,7 +1448,7 @@ in `Route 53`. This way, `GoDaddy` will use the `Route 53`'s DNS
 
 ### DNS Resolution in Hybrid Cloud
 - To resolved DNS queries for resources in the VPC from the on-premises network, create an inbound endpoint on `Route 53 Resolver` and then DNS resolvers on the on-promise network
-can forward DNS queries to Route 53 Resolver vai this endpoint.
+can forward DNS queries to Route 53 Resolver via this endpoint.
 - To resolve DNS queries for resources in the on-premises network from the VPC, create an outbound endpoint on Route 53 Resolver and then Route 53 Resolver can conditionally forward queries to resolvers on the on-premises network via this endpoint. To conditionally forward queries, create Resolver rules that specify the domain names for the DNS queries that you want to forward (such as example.com) and the IP addresses of the DNS resolvers on the on-premises network that you want to forward the queries to.
 
 ## API Gateway
