@@ -1748,7 +1748,7 @@ If you need to ping EC2 instances from on-premises, make sure you add the ICMP p
 
 - **Cost-effective way** (VPN connection as a backup)
   - Implement an `IPSec VPN connection` and use the same `BGP prefix`. Both the Direct Connect connection and IPSec VPN are active and being advertised using the `Border Gateway Protocol (BGP)`. 
-  - The *Direct Connect link will always be preferred* unless it is unavailable.
+  - The **Direct Connect link will always be preferred** unless it is unavailable.
 
 ### Direct Connect Gateway
 - Used to setup a Direct Connect to multiple VPCs, possibly in **different regions but same account**
