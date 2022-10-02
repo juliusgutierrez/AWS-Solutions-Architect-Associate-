@@ -1833,7 +1833,7 @@ Share Transit Gateway across accounts using Resource Access Manager (RAM) connec
   - Inbound/Outbound to internet
   - Direct Connect & Site to Site VPN
 - Internally uses AWS Gateway Load Balancer
-- Rules can be centralize to `AWS Firewall MAanger` to apply to many VPC
+- Rules can be centralize to `AWS Firewall Maanger` to apply to many VPC
 - Traffic filtering: **Allow, drop, alert for the traffic that matches the rules**
 - **Active flow inspection** to protect against network threats with intrusion-prevention capabilities 
 - Send logs that matches to `S3`, `CloudWatch Logs`, `Kinesis Data Firehose`
