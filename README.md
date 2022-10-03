@@ -1524,10 +1524,10 @@ if the user should be allowed to access the resource.
 - <b>AWS reserves 5 IP addresses (first 4 and last 1 in each subnet</b>. These 5 IP addresses are not available for use. 
   - Example: If CIDR block 10.0.0.0/24, then IP addresses are 10.0.0.0, 10.0.0.1, 10.0.0.2, 10.0.0.3 & 10.0.0.255
 
-> To make the EC2 instances running in private subnets accessible on the internet, place them behind an internet facing (running in public subnets) Elastic Load Balancer.
-> 
+> To make the EC2 instances running in private subnets accessible on the internet, place them behind an internet facing
+> (running in public subnets) Elastic Load Balancer.
 > Public subnets are subnets that have: - Auto-assign public IPv4 address set to `Yes` the subnet route table has an attached Internet Gateway
->
+
 ### Internet Gateway (IGW)
 - Allows resources in a VPC to connect to the internet
 - Should be used to connect public resources to the internet (use NAT gateway for private resources)
