@@ -2132,7 +2132,7 @@ use SQS and SNS (AWS proprietary), we can use Amazon MQ (managed Apache ActiveMQ
   * Snowball Edge - Storage Optimized
   * Snowmobile
 
-### Edge Computing
+### Snow Edge Computing
 * Process data while it’s being created on an edge location (could be anything that doesn’t have internet or access to cloud)
 * Long-term deployment options for reduced cost (1 and 3 years discounted pricing)
 * Devices for edge computing
