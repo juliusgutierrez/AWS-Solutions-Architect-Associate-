@@ -172,7 +172,7 @@ ___
 
 ### vCPU & Threads
 - vCPU is the total number of concurrent threads that can be run on an EC2 instance
-- Usually 2 threads per CPU core (eg 4CPU cores -> 8vCPU)
+- Usually 2 threads per CPU core (eg 4CPU cores ⮕ 8vCPU)
 
 ### Amazon Machine Image (AMI)
 - AMIs are the image of the instance after installing all the necessary OS, software and configure everything
@@ -226,7 +226,7 @@ ___
 - Separate public tracfic from private traffic
 - Health check allow ELB to know which instances are working properly (done on port and a route, `/health` is common)
 - <b>Does not support weighted routing</b>
-> if no targets are associated with the target groups -> 503 Service Unavailable
+> if no targets are associated with the target groups ⮕ 503 Service Unavailable
 > Using ALB & NLB, instances in peered VPCs can be used as targets using IP Addresses.
 
 ### Types
@@ -243,9 +243,9 @@ ___
 - <b>Security Groups can be attached to ALBs</b> to filter requests
 - Great for micro services & container-based applications (Docker & ECS)
 - Client info is passed in the request headers
-  - Client IP -> `X-Forwarded-For`
-  - Client Port -> `X-Forwarded-Port`
-  - Protocol -> `X-Forwarded-Proto`
+  - Client IP ⮕ `X-Forwarded-For`
+  - Client Port ⮕ `X-Forwarded-Port`
+  - Protocol ⮕ `X-Forwarded-Proto`
 - Target Groups
   - Health checks are done at the target group level
   - Target Groups could be
@@ -867,7 +867,7 @@ to temporarily access the resource before the URL expires (default 1 hour)
 ### Access Points
 - Each `Access Point` gets it own DNS policy to limit who can access it
   - A specific IAM user/group
-  - One policy per Access Point -> Easier to manage complex bucket policies
+  - One policy per Access Point ⮕ Easier to manage complex bucket policies
 
 ### S3 Object Lambda
 - Use AWS Lambda functions to change the object before it is retrieved by the caller application
@@ -942,7 +942,7 @@ which is in turn promoted to become the new primary
 ### Encryption
 - At rest encryption
   - KMS AES-256 encryption
-  - Encrypted DB -> Encrypted Snapshots, Encrypted Replicas and Vice versa
+  - Encrypted DB ⮕ Encrypted Snapshots, Encrypted Replicas and Vice versa
 - In flight encryption
   - SSL certificates
   - Force all connections to your DB instance to use SSL by setting the `rds.force_ssl` parameter to `true`
@@ -1418,8 +1418,8 @@ if disabled and the master node fails, need to promote a Read Replica as the new
 - <b>Geoproximity</b>
   - Route traffic to your resources based on the proximity of clients to the resources
   - Ability to shift more traffic to resources based on the defined bias.
-    - To expand (bias: 1 to 99) -> more traffic to the resource
-    - to shrink (bias: -1 to -99) -> less traffic to the resource
+    - To expand (bias: 1 to 99) ⮕ more traffic to the resource
+    - to shrink (bias: -1 to -99) ⮕ less traffic to the resource
   - Uses <b>Route 53 traffic flow</b>
 - <b>Multi value</b>
   - Route traffic to multiple resources (max 8)
@@ -1509,9 +1509,9 @@ if the user should be allowed to access the resource.
   - Base IP - 192.168.0.0
   - Subnet Mask (defines how many bits are frozen from the left side) - /16
 - Private IP ranges:
-  - 10.0.0.0 - 10.255.255.255 (10.0.0.0/8) -> used in big networks (24 bits can change)
-  - 172.16.0.0 - 172.31.255.255 (172.16.0.0/12) -> AWS default VPC
-  - 192.168.0.0 - 192.168.255.255 (192.168.0.0/16) -> home networks
+  - 10.0.0.0 - 10.255.255.255 (10.0.0.0/8) ⮕ used in big networks (24 bits can change)
+  - 172.16.0.0 - 172.31.255.255 (172.16.0.0/12) ⮕ AWS default VPC
+  - 192.168.0.0 - 192.168.255.255 (192.168.0.0/16) ⮕ home networks
 - Rest of the IP ranges are Public
 - <b>Max 5 CIDR ver VPC</b>
   - Min.size is /28 (16 IP addresses)
