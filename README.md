@@ -2080,8 +2080,136 @@ use SQS and SNS (AWS proprietary), we can use Amazon MQ (managed Apache ActiveMQ
 * Defines how the data is structured in the event bus
 * Schema can be versioned
 
+# Data Migration & Sync
 
-## Data Migration & Sync
+## Snow Family
+* Offline data migration to Simple Storage Service (S3)
+* Used when it takes a long time to transfer data over the network
+* **Takes around 2 weeks to transfer the data**
+* **Snowball cannot import to Glacier directly** (transfer to S3, configure a lifecycle policy to transition the data into Glacier)
+* Pay per data transfer job
+* Hardware devices for
+* Data Migration (between AWS & on-premise data center)
+* Edge Computing
+* Need to install **OpsHub** software on your computer to manage Snow Family devices
+
+### Devices
+* **Snowcone**
+  * 2 CPUs, **4GB RAM**, wired or wireless access
+  * 8 TB storage
+  * USB-C power using a cord or the optional battery
+  * Good for space-constrained environment
+  * **DataSync Agent** is preinstalled
+  * **Does not support Storage Clustering**
+* **Snowball Edge**
+  * Compute Optimized
+    * 52 vCPUs, 208 GB of RAM
+    * 42 TB storage
+    * Optional GPU (useful for video processing or machine learning)
+    * Supports Storage Clustering
+  * Storage Optimized
+    * Up to 40 CPUs, 80 GB of RAM
+    * 80 TB storage
+    * Supports Storage Clustering (up to 15 nodes)
+    * Transfer up to petabytes
+* **Snowmobile**
+  * 100 PB storage
+  * Used when transferring > **10PB**
+  * Transfer up to exabytes
+  * **Does not support Storage Clustering**
+
+### Data Migration
+* **Provides block storage and Amazon S3-compatible object storage**
+* Usage process: 
+  1. Request Snowball devices from the AWS console for delivery
+  2. **Install the snowball client / AWS OpsHub on your servers**
+  3. Connect the snowball to your servers and copy files using the client
+  4. Ship back the device when you’re done (goes to the right AWS facility)
+  5. Data will be loaded into an S3 bucket
+  6. Snowball is completely wiped
+* Devices for data migration
+  * Snowcone
+  * Snowball Edge - Storage Optimized
+  * Snowmobile
+
+### Edge Computing
+* Process data while it’s being created on an edge location (could be anything that doesn’t have internet or access to cloud)
+* Long-term deployment options for reduced cost (1 and 3 years discounted pricing)
+* Devices for edge computing
+  * Snowcone
+  * Snowball Edge
+* Can run **EC2 Instances & AWS Lambda functions locally on Snow device (using AWS loT Greengrass)**
+
+## Database Migration Service (DMS)
+* Migrate entire databases from on-premises to AWS cloud
+* The source database remains available during migration
+* Continuous Data Replication using CDC (change data capture)
+* Requires EC2 instance running the DMS software to perform the replication tasks. If the amount of data is large, 
+use a large instance. If multi-AZ is enabled, need an instance in each AZ.
+
+> Most resource-efficient way with the least development and no management, to continuously replicate data to `Redshift` 
+> for analytics (first moves data to an S3 bucket and then to Redshift)
+> 
+> DMS supports S3 as the source and Kinesis as the target, so data stored in an S3 bucket can be streamed to Kinesis. 
+> This also supports CDC to stream new data that is put in the S3 bucket.
+
+### Types of Migration
+* **Homogeneous Migration**
+  * When the source and target DB engines are the same (e.g. Oracle to Oracle)
+  * One-step process:
+    * Use the `Database Migration Service (DMS)` to migrate data from the source database to the target database
+* **Heterogeneous Migration**
+* When the source and target DB engines are different (eg. Microsoft SQL Server to Aurora)
+* Two-step process:
+  * Use the `Schema Conversion Tool (SCT)` to convert the source schema and code to match that of the target database
+  * Use the `Database Migration Service (DMS)` to migrate data from the source database to the target database 
+
+### Migrating using Snow Family
+1. Use the Schema Conversion Tool (SCT) to extract the data locally and move it to the Edge device
+2. Ship the Edge device or devices back to AWS
+3. After AWS receives your shipment, the Edge device automatically loads its data into an Amazon S3 bucket.
+4. AWS DMS takes the files and migrates the data to the target data store (eg. DynamoDB)
+
+## Storage Gateway
+* Bridge between on-premises data and S3 for **Hybrid Cloud**
+* Not suitable for one-time sync of large amounts of data (use DataSync instead)
+* Optimizes data transfer by sending only changed data
+
+### Types of Storage Gateway
+* **S3 File Gateway**
+  * Used to expand on-premise NFS by leveraging S3
+  * Configured S3 buckets are accessible on premises using the `NFS` and `SMB` protocol
+  * **Data is cached at the file gateway** for low latency access
+  * Can be mounted on many servers on-premises
+  * Integrated with Active Directory (AD) for user authentication
+
+![](images/datasync_s3_file_gateway.png)
+  
+* **Volume Gateway**
+  * Used for on-premise storage volumes
+  * Uses iSCSI protocol
+  * Two kinds of volumes:
+    * **Cached volumes**: storage extension using S3 with caching at the volume gateway
+    * **Stored volumes**: entire dataset is on premise, scheduled backups to `S3` as `EBS` snapshots
+
+![](images/datasync_volume_gateway.png)
+
+* **Tape Gateway**
+  * Used to back up on-premises data using tape-based process to S3 as Virtual Tapes
+  * Uses **iSCSI protocol**
+
+![](images/datasync_tape_gateway.png)
+
+* **FSx File Gateway**
+  * Used to expand on-premise Windows-based storage by leveraging FSx for Windows
+  * Windows native compatibility (SMB, NTFS, Active Directory)
+  * **Data is cached at the file gateway** for low latency access
+  
+![](images/datasync_fx_file_gateway.png)
+### Storage Gateway - Hardware Appliance
+* Storage Gateway requires on-premises virtualization. If you don’t have virtualization available, 
+you can use a `Storage Gateway - Hardware Appliance`. It is a mini server that you need to install on-premises.
+* Does not work with FSx File Gateway
 
 ## Access Management
 
