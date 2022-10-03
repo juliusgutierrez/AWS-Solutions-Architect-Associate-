@@ -2211,7 +2211,44 @@ use a large instance. If multi-AZ is enabled, need an instance in each AZ.
 you can use a `Storage Gateway - Hardware Appliance`. It is a mini server that you need to install on-premises.
 * Does not work with FSx File Gateway
 
-## Access Management
+## DataSync
+* Move **large amounts** of data from your on-premises NAS or file system via NFS or SMB protocol to AWS over the **public internet using TLS**
+* Can synchronize to:
+  * S3 (all storage classes)
+  * EFS
+  * FSx for Windows
+* **Scheduled Replication** (not continuous)
+* **Need to install AWS DataSync Agent on premises**
+
+<img height="60%" src="images/datasync_datasync.png" width="60%"/>
+
+* Can also be used to transfer between AWS storage services
+
+<img height="60%" src="images/datasync_transfer_between_aws_storage_services.png" width="60%"/>
+
+* Suitable in automating and accelerating online data transfers to a variety of AWS storage services (over Storage Gateway which only works with S3)
+> Perfect to move large amounts of historical data from on-premises to S3 Glacier Deep Archive (directly).
+
+## AppSync
+* Store and **sync data across mobile** and **web apps** in **real-time**
+* Makes use of **GraphQL** (mobile technology from Facebook)
+* **Offline data synchronization** (replaces Cognito Sync)
+
+## Transfer Family
+* AWS managed service to transfer files in and out of Simple Storage Service (S3) using FTP 
+(instead of using proprietary methods)
+* Supported Protocols
+  * FTP (File Transfer Protocol) - unencrypted in flight
+  * FTPS (File Transfer Protocol over SSL) - encrypted in flight
+  * SFTP (Secure File Transfer Protocol) - encrypted in flight
+* Supports Multi AZ
+* Pay per provisioned endpoint per hour + fee per GB data transfers
+* Clients can either connect directly to the FTP endpoint or optionally through Route 53
+* Transfer Family will need permission to read or put data into S3 or EFS
+
+<img src="images/datasync_tranfer_family.png" width="60%"/>
+
+# Access Management
 
 ## Distribution
 
