@@ -1993,7 +1993,7 @@ Failed messages (after the set number of retries) are sent to the DLQ by the SQS
 ### SNS + Lambda + DLQ
 Lambda retries each failed message 3 times after which it is **sent to the DLQ by lambda**
 
-![](images/msg_sns_fanout.png)
+![](images/msg_sns_lambda_dlq.png)
 
 
 
