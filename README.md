@@ -1987,7 +1987,7 @@ Failed messages (after the set number of retries) are sent to the DLQ by the SQS
 
 ### Message Filtering
 * JSON policy used to filter messages sent to SNS topic’s subscriptions
-* Each subscriber will have its own filter policy (if a subscriber doesn’t have a filter policy, it receives every message)
+* Each subscriber will have its own filter policy (if a subscriber doesn't have a filter policy, it receives every message)
 * Ex: filter messages sent to each queue by the order status
 
 ### SNS + Lambda + DLQ
@@ -1995,6 +1995,90 @@ Lambda retries each failed message 3 times after which it is **sent to the DLQ b
 
 ![](images/msg_sns_lambda_dlq.png)
 
+## Kinesis
+> Kinesis Agent cannot write to a Kinesis Firehose for which the delivery stream source is already set as Kinesis Data Streams
+
+### Kinesis Data Stream (KDS) 
+* Real-time data streaming service
+* **Used to ingest data in real time directly from source**
+* Throughput
+  * Publishing: 1MB/sec per shard or 1000 msg/sec per shard
+  * Consuming:
+    * 2MB/sec per shard (throughput shared between all consumers)
+    * Enhanced Fanout: 2MB/sec per shard per consumer (dedicated throughput for each consumer)
+* Throughput scales with shards (manual scaling)
+* **Not Serverless**
+* Billing per shard (provisioned)
+* **Data Retention: 1 day (default) to 365 days**
+* A record consists of a **partition key** (used to partition data coming from multiple publishers) and data blob **(max 1MB)**
+* Records will be ordered in each shard
+* Producers use SDK, Kinesis Producer Library (KPL) or **Kinesis Agent** to publish records
+* Consumers use SDK or Kinesis Client Library (KCL) to consume the records
+* **Once data is inserted in Kinesis, it can’t be modified or deleted (immutability)**
+* Ability to reprocess (replay) data
+
+![](images/msg_kinesis_data_stream.png)
+
+### Kinesis Data Firehose (KDF)
+* Used to load streaming data into a target location
+* **Writes data in batches efficiently (near real time)**
+* **Can ingest data in real time directly from source**
+* Greater the batch size, higher the write efficiency
+* **Auto-scaling**
+* **Serverless**
+* Destinations:
+  * AWS: Redshift, S3, **ElasticSearch**
+  * 3rd party: Splunk, MongoDB, DataDog, NewRelic, etc.
+  * Custom: send to any HTTP endpoint
+* Pay for data going through Firehose (no provisioning)
+* **Supports custom data transformation using Lambda functions**
+* **Max record size: 1MB**
+* No replay capability
+
+![](images/msg_kinesis_data_firehose.png)
+
+### Kinesis Data Analytics (KDA)
+* Perform **real-time analytics on Kinesis streams using SQL**
+* Create streams from SQL query response
+* **Cannot ingest data directly from source** (ingests data from KDS or KDF)
+* **Auto-scaling**
+* **Serverless**
+* Pay for the data processed (no provisioning)
+* Use cases:
+  * Time-series analytics
+  * Real-time dashboards
+  * Real-time metrics
+
+![](images/msg_kinesis_data_analytics.png)
+
+## Amazon MQ
+* If you have some traditional applications running from on-premise, they may use open protocols such as 
+MQTT, AMQP, STOMP, Openwire, WSS, etc. When migrating to the cloud, instead of re-engineering the application to 
+use SQS and SNS (AWS proprietary), we can use Amazon MQ (managed Apache ActiveMQ) for communication.
+* Doesn't `scale` as much as SQS or SNS because it is provisioned
+* Runs on a dedicated machine (can run in HA with failover)
+* Has both queue feature (SQS) and topic features (SNS)
+### High Availability
+
+* High Availability in Amazon MQ works by leveraging MQ broker in multi AZ (active and standby).
+* EFS (NFS that can be mounted to multi AZ) is used to keep the files safe in case the main AZ is down.
+
+![](images/msg_amazon_mq.png)
+
+## EventBridge
+* Extension of CloudWatch ⮕ Events
+* Event buses types:
+  * **Default event bus**: events from AWS services are sent to this
+  * **Partner event bus**: receive events from external SaaS applications
+  * **Custom Event bus**: for your own applications
+* Event Rules: how to process the events
+* **Event buses support cross-account access**
+* **Cron Jobs**: when creating an EB rule, we can select `Schedule` instead of event pattern to trigger an event based on a cron expression.
+> EventBridge is recommended for decoupling applications that reacts to events from third-party `SaaS` applications.
+
+### Schema Registry
+* Defines how the data is structured in the event bus
+* Schema can be versioned
 
 
 ## Data Migration & Sync
