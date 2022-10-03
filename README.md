@@ -2220,11 +2220,11 @@ you can use a `Storage Gateway - Hardware Appliance`. It is a mini server that y
 * **Scheduled Replication** (not continuous)
 * **Need to install AWS DataSync Agent on premises**
 
-<img height="60%" src="images/datasync_datasync.png" width="60%"/>
+<img height="60%" src="images/datasync_datasync.png" width="85%"/>
 
 * Can also be used to transfer between AWS storage services
 
-<img height="60%" src="images/datasync_transfer_between_aws_storage_services.png" width="60%"/>
+<img height="60%" src="images/datasync_transfer_between_aws_storage_services.png" width="85%"/>
 
 * Suitable in automating and accelerating online data transfers to a variety of AWS storage services (over Storage Gateway which only works with S3)
 > Perfect to move large amounts of historical data from on-premises to S3 Glacier Deep Archive (directly).
@@ -2246,7 +2246,7 @@ you can use a `Storage Gateway - Hardware Appliance`. It is a mini server that y
 * Clients can either connect directly to the FTP endpoint or optionally through Route 53
 * Transfer Family will need permission to read or put data into S3 or EFS
 
-<img src="images/datasync_tranfer_family.png" width="60%"/>
+<img src="images/datasync_tranfer_family.png" width="85%"/>
 
 # Access Management
 
