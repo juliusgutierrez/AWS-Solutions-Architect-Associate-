@@ -2093,7 +2093,7 @@ use SQS and SNS (AWS proprietary), we can use Amazon MQ (managed Apache ActiveMQ
 * Edge Computing
 * Need to install **OpsHub** software on your computer to manage Snow Family devices
 
-### Devices
+### Snow Devices
 * **Snowcone**
   * 2 CPUs, **4GB RAM**, wired or wireless access
   * 8 TB storage
@@ -2118,7 +2118,7 @@ use SQS and SNS (AWS proprietary), we can use Amazon MQ (managed Apache ActiveMQ
   * Transfer up to exabytes
   * **Does not support Storage Clustering**
 
-### Data Migration
+### Snow Family Data Migration
 * **Provides block storage and Amazon S3-compatible object storage**
 * Usage process: 
   1. Request Snowball devices from the AWS console for delivery
