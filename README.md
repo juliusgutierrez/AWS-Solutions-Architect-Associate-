@@ -1851,7 +1851,7 @@ Share Transit Gateway across accounts using Resource Access Manager (RAM) connec
 - **Max message size: 256KB**
 - **Default message retention: 4 days (max: 14 days)**
 - **Consumers could be EC2 instances or Lambda functions**
-> SQS cannot ingest data, it must be sent to the queue by the producer (use Kinesis ⮕ Kinesis Data Stream KDS instead)
+> SQS cannot ingest data, it must be sent to the queue by the producer (use Kinesis ⮕ Kinesis Data Stream (KDS) instead)
 
 ### Queue Types
 
@@ -1859,7 +1859,7 @@ Share Transit Gateway across accounts using Resource Access Manager (RAM) connec
   - Unlimited throughput (publish any number of message per second into the queue)
     - Low latency (<10 ms on publish and receive)
     - Can have duplicate messages (at least once delivery)
-  - Can have out of order messages (best effort ordering)
+  - Can have out of order messages (best-effort ordering)
   
 - **FIFO Queue**
   - Limited throughput
@@ -1867,7 +1867,7 @@ Share Transit Gateway across accounts using Resource Access Manager (RAM) connec
     - 3000 msg/s with batching (batch size = 10)
   - No duplicate messages
   - Guaranteed ordering of messages
-  - **The queue name must end with** .fifo to be considered a FIFO queue
+  - **The queue name must end with** `.fifo` to be considered a FIFO queue
   - Sending messages to a FIFO queue requires:
     - **Group ID**: messages will be ordered and grouped for each group ID
     - **Message deduplication ID**: for deduplication of messages
