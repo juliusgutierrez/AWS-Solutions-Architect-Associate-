@@ -2007,7 +2007,7 @@ Lambda retries each failed message 3 times after which it is **sent to the DLQ b
     * 2MB/sec per shard (throughput shared between all consumers)
     * Enhanced Fanout: 2MB/sec per shard per consumer (dedicated throughput for each consumer)
 * Throughput scales with shards (manual scaling)
-* **Not Serverless**
+* **Serverless**
 * Billing per shard (provisioned)
 * **Data Retention: 1 day (default) to 365 days**
 * A record consists of a **partition key** (used to partition data coming from multiple publishers) and data blob **(max 1MB)**
