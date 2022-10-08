@@ -2250,6 +2250,23 @@ you can use a `Storage Gateway - Hardware Appliance`. It is a mini server that y
 
 # Access Management
 
+## Identity & Access Management (IAM)
+* Global Service (IAM entities like roles can be used in any region without recreation)
+> IAM Query API can be used to make direct calls to the IAM web service (using access key ID and secret access key for authentication)
+
+### Users & Groups
+* Groups are collections of users and have policies attached to them
+* Groups cannot be nested
+* User can belong to multiple groups
+* User doesn't have to belong to a group
+* **Root User** has full access to the account
+* **IAM User** has limited permission to the account
+* You should log in as an IAM user with admin access even if you have root access. This is just to be sure that nothing goes wrong by accident.
+
+> * An IAM Group is not an identity and cannot be identified as a principal in an IAM policy 
+> * Only users and services can assume a role (not groups)
+> * A new IAM user created using the AWS CLI or AWS API has no AWS credentials
+
 ## Distribution
 
 ## Monitoring & Audit
