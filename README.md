@@ -2267,6 +2267,223 @@ you can use a `Storage Gateway - Hardware Appliance`. It is a mini server that y
 > * Only users and services can assume a role (not groups)
 > * A new IAM user created using the AWS CLI or AWS API has no AWS credentials
 
+### Policies
+* Policies are JSON documents that outline permissions for users, groups or roles
+* Two types
+  * **User based policies**
+    * IAM policies define which API calls should be allowed for a specific user
+  * **Resource based policies**
+    * Control access to an AWS resource
+    * Grant the specified principal permission to perform actions on the resource and define under what conditions this applies
+* An IAM principal can access a resource if the user policy ALLOWS it OR the resource policy ALLOWS it AND there’s no explicit DENY.
+* Policies assigned to a user are called inline policies
+* Follow the least privilege principle for IAM Policies
+
+![](images/am_policies_structure.png)
+
+* **Trust Policies**
+* Defines which principal entities (accounts, users, roles, federated users) can assume the role
+* An IAM role is both an identity and a resource that supports resource-based policies.
+* You must attach both a trust policy and an identity-based policy to an IAM role.
+* The IAM service supports only one type of resource-based policy called a role trust policy, 
+which is attached to an IAM role.
+
+### Roles
+- Collection of policies for AWS services
+> If you are going to use an IAM Service Role with Amazon EC2 or another AWS service that uses Amazon EC2, 
+you must store the role in an instance profile. When you create an IAM service role for EC2, the role automatically 
+has EC2 identified as a trusted entity.
+
+### Protect IAM Accounts
+* **Password Policy**
+  * Used to enforce standards for password
+    * password rotation
+    * password reuse
+  * Prevents brute force attack
+* **Multi-Factor Authentication (MFA)**
+* Both root user and IAM users should use MFA
+
+### Reporting Tools
+* **Credentials Report**
+  * lists all the users and the status of their credentials (MFA, password rotation, etc.)
+  * account level - used to audit security for all the users
+* **Access Advisor**
+  * shows the service permissions granted to a user and when those services were last accessed
+  * user-level
+  * used to revise policies for a specific user
+  
+### Access Keys
+* Need to use access keys for AWS CLI and SDK
+* Don't share access keys with anyone (every user can generate their own access keys)
+* Access keys are only shown once and if you lose them you need to generate new access key
+* Access Key ID ~ username
+* Secret Access Key ~ password
+
+### Guidelines
+* Use root account only for account setup
+* 1 physical user = 1 IAM user
+* Enforce MFA for both root and IAM users
+* Never share lAM credentials & Access Keys
+
+### Policy Simulator
+- Online tool that allows us to check what API calls an IAM User, Group or Role is allowed to perform based on the permissions they have.
+
+### Permission Boundaries
+* Set the maximum permissions an IAM entity can get
+* Can be applied to users and roles (not groups)
+* Used to ensure some users can’t escalate their privileges (make themselves admin)
+
+### Assume Role vs Resource-based Policy
+* When you assume an IAM Role, you give up your original permissions and take the permissions assigned to the role
+* When using a resource based policy, the principal doesn't have to give up their permissions
+
+## Cognito
+
+Amazon Cognito lets you add user sign-up, sign-in, and access control to your web and mobile apps quickly and easily. Amazon Cognito scales to millions of users and supports sign-in with social identity providers, such as Apple, Facebook, Google, and Amazon, and enterprise identity providers via SAML 2.0 and OpenID Connect.
+
+### Cognito User Pools (CUP)
+* **Serverless** identity provider (provides sign in functionality for app users)
+* Sends back a JSON Web Token (used to verify the identity of the user)
+* **MFA support**
+* **Supports Federated Identities** allowing users to authenticate via third party identity provider like Facebook, Google, SAML, etc.
+* Seamless integration with **API Gateway & ALB** for authentication
+
+### Cognito Identity Pools (CIP)
+* Provides temporary credentials (using STS) to users so they can access AWS resources
+* Integrates with CUP as an identity provider
+* Example use case: provide **temporary access to write to an S3 bucket** after authenticating the user via FaceBook (using CUP identity federation)
+  * Can't use S3 pre-signed URL as we need to provide access to a bucket location and not an single object
+
+## Security Token Service (STS)
+* Used to grant limited and temporary access to AWS resources
+* Token is valid for up to 1h
+
+### AssumeRole
+* **Allows IAM Users to assume an IAM Role**
+* Steps to assume a role
+  * Create an lAM Role (within your account or cross-account)
+  * Trust Policy: define which principals should be allowed to assume this role
+  * Use STS AssumeRole API to retrieve temporary credentials for the IAM role
+  * STS will check with IAM whether or not the user is allowed to assume that role
+
+![](images/am_assume_role.png)
+
+* Use cases:
+  * Safety: deleting a resource first requires users to temporarily assume a role
+  * **Cross-account access**: assume role in target account to perform actions there
+
+### AssumeRoleWithSAML
+- Allow non IAM users logged in with SAML to assume an IAM role
+### AssumeRoleWithWebldentity
+* Allow non IAM users logged in via an identity provider (Facebook, Google, etc.) to assume an IAM role
+* AWS recommends using Cognito instead
+
+## Identity Federation in AWS
+* Federation lets **users outside of AWS to assume temporary role** for accessing AWS resources using a **third-party identity provider**
+* **Need to configure IAM roles** with the required policies that users will assume
+* No need to create lAM users (user management by the third-party identity provider)
+* Need to setup a trust between identity provider and IAM
+* Flavors
+  * SAML 2.0
+  * Custom Identity Broker
+  * Web Identity Federation with Amazon Cognito
+  * Web Identity Federation without Amazon Cognito (not recommended)
+  * Single Sign On
+  * Non-SAML with AWS Microsoft AD
+
+### SAML 2.0 Federation
+* Used to integrate **Active Directory / ADFS** with AWS using **SAML compatible IDP**
+* **Client exchanges SAML assertion for security credentials from STS** using the STS AssumeRoleWithSAML API
+> SSO can be implemented using an existing IDP like AD using SAML 2.0 Federation
+
+### Custom Identity Broker Federation
+* Used when the identity provider is **not compatible with SAML 2.0 or OIDC**
+* **Identity broker gets security credentials from STS** using the STS `AssumeRole` or `GetFederationToken API`
+* **Steps in Custom Identity Broker Federation**
+* Verify that the user is authenticated by your local IDP (could be AD)
+* Call the STS **AssumeRole** or **GetFederationToken API** to obtain temporary security credentials for the user 
+* Call the **AWS Federation Endpoint** and supply the temporary security credentials to request a sign-in token
+
+### Web Identity Federation with Cognito
+* Use for **OpenID Connect (OIDC) compatible IDP** like CUP, FaceBook, Google etc.
+* Example: provide temporary access to write to S3 bucket using Facebook Login
+* Steps
+  * Log in to federated identity provider to get JWT
+  * Use the JWT to authenticate to Federated Identity Pool
+  * Get temporary AWS credentials back from the Federated Identity Pool
+
+![](images/am_federation_identity.png)
+
+## AWS Organizations
+* **Global service**
+* Manage multiple AWS accounts under an organization
+  * 1 master account
+  * member accounts
+* An AWS account can only be part of one organization
+* **Consolidated Billing** across all accounts (lower cost)
+* Pricing benefits from aggregated usage of AWS resources
+* API to automate AWS account creation (on demand account creation)
+* Establish Cross Account Roles for Admin purposes where the master account can assume an admin role in any of the children accounts
+> Organization API can only create member accounts. They cannot configure anything within those accounts (use CloudFormation for that).
+
+### Organizational Units (OU)
+- Folders for grouping AWS accounts of an organization
+<img src="images/am_org_unit.png" width="80%"/>
+
+### Service Control Policies (SCP)
+* **Whitelist or blacklist IAM actions at the OU or Account level**
+* **Does not apply to the Master Account**
+* Applies to all the Users and Roles of the member accounts, including the root user. So, if something is restricted for that account, even the root user of that account won’t be able to do it.
+* Must have an explicit allow **(does not allow anything by default)**
+* **Does not apply to service-linked roles**
+* **Explicit Deny** has the highest precedence
+
+### Migrating Accounts between Organizations
+* To migrate member accounts from one organization to another
+  1. Remove the member account from the old organization
+  2. Send an invitation to the member account from the new organization
+  3. Accept the invite from the member account
+* To migrate the master account
+  1. Remove the member accounts from the organizations using procedure above
+  2. Delete the old organization
+  3. Repeat the process above to invite the old master account to the new org
+
+## AWS Directory Services
+- Used to extend the AD network by involving services like EC2 to be a part of the AD to share login credentials.
+
+> **Exam tip**
+> Use AWS Managed Microsoft AD unless the problem specifically asks for properties of AD Connector or Simple AD
+
+### AWS Managed Microsoft AD
+* Login credentials are shared between on-premise and AWS managed AD
+* **Manage users on both AD** (on-premise and on AWS managed AD)
+* Supports MFA
+* Establish trust connections with your on premise AD
+* Supports **directory-aware workloads on AWS**
+
+### AD Connector
+* AD connector will proxy all the requests to the on-premise AD
+* **Users are managed on the on-premise AD only**
+* Does not support directory-aware workloads on AWS
+
+### Simple AD
+* AD-compatible managed directory on AWS (cannot be joined with on-premise AD)
+* **Users are managed on the AWS AD only**
+* Use when you don’t have an on-premise AD
+
+## AWS Single Sign-On (SSO)
+* **Free service**
+* **Integrated with AWS Organizations** (login once for your org and you can access all the accounts within that org)
+* **Integration with on-premise Active Directory**
+* **Supports SAML 2.0**
+* Centralized auditing with CloudTrail
+
+### Federated SSO vs AWS SSO
+* With Federated SSO, we need to maintain a **3rd party identity provider** (AD/ADFS, CUP, Google, Facebook, custom identity broker) login portal. The IDP returns the JWT or SAML Assertion which the client needs to exchange with STS for login credentials.
+* With AWS SSO, we don’t need to manage the login portal, it is done through the AWS SSO. It returns the credentials directly.
+
+![](images/am_sso.png)
+
 ## Distribution
 
 ## Monitoring & Audit
