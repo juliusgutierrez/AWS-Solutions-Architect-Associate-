@@ -2089,9 +2089,9 @@ use SQS and SNS (AWS proprietary), we can use Amazon MQ (managed Apache ActiveMQ
 * **Snowball cannot import to Glacier directly** (transfer to S3, configure a lifecycle policy to transition the data into Glacier)
 * Pay per data transfer job
 * Hardware devices for
-* Data Migration (between AWS & on-premise data center)
-* Edge Computing
-* Need to install **OpsHub** software on your computer to manage Snow Family devices
+  * Data Migration (between AWS & on-premise data center)
+  * Edge Computing
+  * Need to install **OpsHub** software on your computer to manage Snow Family devices
 
 ### Snow Devices
 * **Snowcone**
