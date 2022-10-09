@@ -2559,16 +2559,17 @@ Amazon Cognito lets you add user sign-up, sign-in, and access control to your we
     * IoT (MQTT)
     * Voice over IP (VoIP)
   * HTTP use cases that require static IP addresses or fast regional failover
+
 ### Working
-2 any-cast public IPs (static) are created for your application globally. Requests from clients hitting these IPs will automatically be routed to the nearest edge location. The Edge locations send the traffic to your application through the private AWS network.
-Traffic dials to control the percentage of traffic that is directed to an endpoint group (an AWS region where your application is deployed)
-Endpoint weights to determine the proportion of traffic that is directed to endpoints in an endpoint group
-### Disaster Recovery¶
-Global Accelerator performs health checks for the application
-Failover in less than 1 minute for unhealthy endpoints
-### Security¶
-Only 2 static IP need to be whitelisted by the clients
-Can be integrated with AWS Shield for DDoS protection
+* 2 any-cast public IPs (static) are created for your application globally. Requests from clients hitting these IPs will automatically be routed to the nearest edge location. The Edge locations send the traffic to your application through the private AWS network.
+* Traffic dials to control the percentage of traffic that is directed to an endpoint group (an AWS region where your application is deployed)
+* Endpoint weights to determine the proportion of traffic that is directed to endpoints in an endpoint group
+### Disaster Recovery
+* Global Accelerator performs health checks for the application
+* Failover in less than 1 minute for unhealthy endpoints
+### Security
+* Only 2 static IP need to be whitelisted by the clients
+* Can be integrated with AWS Shield for DDoS protection
 
 
 ## Monitoring & Audit
