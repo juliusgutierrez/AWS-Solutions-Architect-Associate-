@@ -2159,10 +2159,10 @@ use a large instance. If multi-AZ is enabled, need an instance in each AZ.
   * One-step process:
     * Use the `Database Migration Service (DMS)` to migrate data from the source database to the target database
 * **Heterogeneous Migration**
-* When the source and target DB engines are different (eg. Microsoft SQL Server to Aurora)
-* Two-step process:
-  * Use the `Schema Conversion Tool (SCT)` to convert the source schema and code to match that of the target database
-  * Use the `Database Migration Service (DMS)` to migrate data from the source database to the target database 
+  * When the source and target DB engines are different (eg. Microsoft SQL Server to Aurora)
+  * Two-step process:
+    * Use the `Schema Conversion Tool (SCT)` to convert the source schema and code to match that of the target database
+    * Use the `Database Migration Service (DMS)` to migrate data from the source database to the target database 
 
 ### Migrating using Snow Family
 1. Use the Schema Conversion Tool (SCT) to extract the data locally and move it to the Edge device
