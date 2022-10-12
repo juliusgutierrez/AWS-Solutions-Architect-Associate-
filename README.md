@@ -2518,9 +2518,9 @@ Amazon Cognito lets you add user sign-up, sign-in, and access control to your we
 * Signed URL ⇒ access to individual files
 * Signed Cookies ⇒ access to multiple files
 * Whenever we create a signed URL / cookie, we attach a policy specifying:
-* URL / Cookie Expiration (TTL)
-* IP ranges allowed to access the data
-* Trusted signers (which AWS accounts can create signed URLs)
+  * URL / Cookie Expiration (TTL)
+  * IP ranges allowed to access the data
+  * Trusted signers (which AWS accounts can create signed URLs)
 
 ### Pricing
 * Price Class All: all regions (best performance)
