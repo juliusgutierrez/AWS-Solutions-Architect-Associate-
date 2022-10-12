@@ -2478,6 +2478,8 @@ Amazon Cognito lets you add user sign-up, sign-in, and access control to your we
 * **Supports SAML 2.0**
 * Centralized auditing with CloudTrail
 
+![](images/am_aws_sso.png)
+
 ### Federated SSO vs AWS SSO
 * With Federated SSO, we need to maintain a **3rd party identity provider** (AD/ADFS, CUP, Google, Facebook, custom identity broker) login portal. The IDP returns the JWT or SAML Assertion which the client needs to exchange with STS for login credentials.
 * With AWS SSO, we don’t need to manage the login portal, it is done through the AWS SSO. It returns the credentials directly.
