@@ -2573,8 +2573,200 @@ Amazon Cognito lets you add user sign-up, sign-in, and access control to your we
 * Only 2 static IP need to be whitelisted by the clients
 * Can be integrated with AWS Shield for DDoS protection
 
+# Monitoring & Audit
 
-## Monitoring & Audit
+## CloudWatch
+- Serverless performance monitoring service
+### Metrics
+  * Variables to monitor in CloudWatch
+    * Dimension is an attribute of a metric (instance id, environment, etc.)
+    * Up to 10 dimensions per metric
+    * Segregated by namespaces (which AWS service they monitor)
+  * **Custom Metrics**
+    * Define and send your own custom metrics to CloudWatch using PutMetricData API
+    * Metric resolution (StorageResolution API) - frequency of sending metric data
+    * Standard: 60 seconds
+    * High Resolution: 1/5/10/30 seconds (higher cost)
+    * Accepts metric data points two weeks in the past and two hours in the future
+  * **EC2 Monitoring**
+    * Must run a CloudWatch agent on instance to push system metrics and logs to CloudWatch.
+    * EC2 instances have metrics every 5 minutes
+    * With detailed monitoring (for a cost), you get metrics every 1 minute
+    * Use detailed monitoring if you want to react faster to changes (eg. scale faster for your ASG)
+    * Available metrics in CloudWatch:
+      * CPU Utilization
+      * Network Utilization
+      * Disk Performance
+      * Disk Reads/Writes
+    * Custom metrics:
+      * Memory utilization (memory usage)
+      * Disk swap utilization
+      * Disk space utilization
+      * Page file utilization
+    * lAM permissions must allow the instance to push logs to CloudWatch
+    * CloudWatch agent can be used for logging on premises servers too
+    * Can send logs & additional system-level metrics
+      * CPU (active, guest, idle, system, user, steal)
+      * Disk metrics (free, used, total), Disk IO (writes, reads, bytes, iops)
+      * RAM (free, inactive, used, total, cached)
+      * Netstat (number of TCP and UDP connections, net packets, bytes)
+      * Processes (total, dead, bloqued, idle, running, sleep)
+      * Swap Space (free, used, used %)
+
+### Dashboards
+* Setup custom dashboards for quick access to key metrics and alarms
+* Dashboards are global (allows to monitor services across accounts & regions)
+* Dashboards can be shared with people who don’t have an AWS account (public, email address, 3rd party SSO provider through Cognito)
+### Logs
+* Used to store application logs
+* Logs Expiration: never expire, 30 days, etc.
+* Logs can be sent to:
+  * S3 buckets (exports)
+  * Kinesis Data Streams
+  * Kinesis Data Firehose
+  * Lambda functions
+  * ElasticSearch
+* **Metric Filters** can be used to filter expressions and use the count to trigger CloudWatch alarms. Example filters:
+  * find a specific IP in the logs
+  * count occurrences of “ERROR” in the logs
+* `Cloud Watch Logs Insights` can be used to query logs and add queries to CloudWatch Dashboards
+* Logs can take up to **12 hours to become available for exporting to S3** (not real-time)
+* To stream logs in real-time, apply a **Subscription Filter** on logs
+* Logs from multiple accounts and regions can be aggregated using subscription filters
+
+![](images/cw_aggregation.png)
+
+>Metric Filters are a part of CloudWatch Logs (not CloudWatch Metrics)
+
+### CloudWatch Alarms
+* Alarms are used to trigger notifications for CW metrics based on Metric Filters
+* Various options to trigger alarm (sampling, %, max, min, etc.)
+* Alarm States:
+  * OK
+  * INSUFFICIENT_DATA
+  * ALARM
+* Period:
+  * Length of time in seconds to evaluate the metric before triggering the alarm
+  * High resolution custom metrics: 10 sec, 30 sec or multiples of 60 sec
+* Targets:
+  * Stop, Terminate, Reboot, or Recover an EC2 Instance
+  * Trigger Auto Scaling Action (ASG)
+  * Send notification to SNS
+
+
+> EC2 Instance Recovery
+> * CloudWatch alarm to automatically recover an EC2 instance if it becomes impaired
+> * Terminated instances cannot be recovered
+> * After the recovery, the following are retained
+> * Placement Group
+> * Public IP
+> * Private IP
+> * Elastic IP
+> * Instance ID
+> * Instance metadata
+> * After the recovery, RAM contents are lost
+
+### CloudWatch Events
+* Schedule or Cron to create events on a schedule
+* Uses default event bus (custom & partner event buses are not supported)
+
+## CloudTrail
+* **Global Service** (a single trail can be applied to multiple regions)
+* Provides governance, compliance and audit for the AWS Account
+* Enabled by default
+* Records the API calls made within the AWS account
+* **Event retention: 90 days**
+* Export CloudTrail logs into
+  * CloudWatch Logs
+  * S3 (encrypted by default using SSE-S3)
+
+> Modifications to log files can be detected by enabling Log File Validation on the logging bucket
+
+
+### Event Types
+* **Management Events**
+  * Events of operations that modify AWS resources. Ex:
+    * Creating a new IAM user
+    * Deleting a subnet
+  * **Enabled by default**
+  * Can separate Read Events (that don’t modify resources) from Write Events (that may modify resources)
+* **Data Events**
+  * Events of operations that modify data
+  * S3 object-level activity
+  * Lambda function execution
+  * **Disabled by default** (due to high volume of data events)
+* **Insight Events**
+* Enable `CloudTrail Insights` to detect unusual activity in your account
+  * inaccurate resource provisioning
+  * hitting service limits
+  * bursts of AWS IAM actions
+  * gaps in periodic maintenance activity
+* `CloudTrail` Insights analyzes normal management events to create a baseline and then continuously analyzes write events to detect unusual patterns. If that happens, CloudTrail generates insight events that
+  * show anomalies in the Cloud Trail console
+  * can can be logged to S3
+  * can trigger an EventBridge event for automation
+
+### Encryption
+* CloudTrail logs are encrypted by default using SSE-S3
+* A single KMS key can be used to encrypt log files for trails applied to all regions
+
+## Config
+* Regional service
+* Can be aggregated across regions and accounts
+* Record configurations changes over time
+* **Evaluate compliance of resources using config rules**
+* **Does not prevent non-compliant actions** from happening (no deny)
+* Evaluate config rules
+  * for each config change (ex. configuration of EBS volume is changed)
+  * at regular time intervals (ex. every 2 hours)
+* Can make custom config rules (must be defined in Lambda functions) such as:
+  * Check if each EBS disk is of type gp2
+  * Check if each EC2 instance is t2.micro
+* **Can be used along with CloudTrail** to get a timeline of changes in configuration and compliance overtime.
+* **Integrates with** `EventBridge` or `SNS` to trigger notifications when AWS resources are non-compliant
+
+### Remediation
+* Automate remediation of non-compliant resources using **SSM Automation Documents**
+  * AWS-Managed Automation Documents
+  * **Custom Automation Documents**
+    * to invoke a Lambda function for automation
+* You can set Remediation Retries if the resource is still non-compliant after auto remediation
+* Ex. if IAM access key expires (non-compliant), trigger an auto-remediation action to revoke unused IAM user credentials.
+
+## X-Ray
+* Provides an **end-to-end view of requests as they travel through your application**, and shows a map of your application’s underlying components.
+* AWS X-Ray helps developers analyze and debug production, distributed applications, such as those built using a **micro-services architecture**.
+* Helps understand how your application and its underlying services are performing to identify and troubleshoot the root cause of performance issues and errors.
+* Can collect data across AWS Accounts. The **X-Ray agent can assume a role** to publish data into an account different 
+from the one in which it is running. This enables you to publish data from various components of your application into a **central account**.
+
+
+## Trusted Advisor
+* Service that analyzes your AWS accounts and provides recommendations on:
+  * **Cost Optimization**
+    * low utilization EC2 instances, EBS volumes, idle load balancers, etc.
+    * Reserved instances & savings plans optimizations
+  * **Performance**
+    * High utilization EC2 instances, CloudFront CDN optimizations
+    * EC2 to EBS throughput optimizations, Alias records recommendations
+  * **Security**:
+    * MFA enabled on Root Account, IAM key rotation, exposed Access Keys
+    * S3 Bucket Permissions for public access, security groups with unrestricted ports
+  * **Fault Tolerance**:
+    * EBS snapshots age, Availability Zone Balance
+    * ASG Multi-AZ, RDS Multi-AZ, ELB configuration, etc.
+  * **Service Limits**
+    * whether or not you are reaching the service limit for a service and suggest you to increase the limit beforehand
+* **No installation needed**
+* **Weekly email notifications**
+
+## CostExplorer
+* Visualize and manage your costs and service usage over time
+* Create **custom reports** that analyze cost and usage data
+* **Recommendations** to choose an optimal savings plan
+* View usage for the **last 12 months & forecast up to 12 months**
+> AWS Cost Explorer helps you identify under-utilized EC2 instancess
+
 
 ## Containerization
 
