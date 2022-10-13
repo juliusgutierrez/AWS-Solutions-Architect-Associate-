@@ -2696,15 +2696,15 @@ Amazon Cognito lets you add user sign-up, sign-in, and access control to your we
   * Lambda function execution
   * **Disabled by default** (due to high volume of data events)
 * **Insight Events**
-* Enable `CloudTrail Insights` to detect unusual activity in your account
-  * inaccurate resource provisioning
-  * hitting service limits
-  * bursts of AWS IAM actions
-  * gaps in periodic maintenance activity
-* `CloudTrail` Insights analyzes normal management events to create a baseline and then continuously analyzes write events to detect unusual patterns. If that happens, CloudTrail generates insight events that
-  * show anomalies in the Cloud Trail console
-  * can can be logged to S3
-  * can trigger an EventBridge event for automation
+  * Enable `CloudTrail Insights` to detect unusual activity in your account
+    * inaccurate resource provisioning
+    * hitting service limits
+    * bursts of AWS IAM actions
+    * gaps in periodic maintenance activity
+  * `CloudTrail Insights` analyzes normal management events to create a baseline and then continuously analyzes write events to detect unusual patterns. If that happens, CloudTrail generates insight events that
+    * show anomalies in the Cloud Trail console
+    * can can be logged to S3
+    * can trigger an EventBridge event for automation
 
 ### Encryption
 * CloudTrail logs are encrypted by default using SSE-S3
