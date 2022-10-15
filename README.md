@@ -489,7 +489,7 @@ in that edge location to perform some operation like fetching data from `DynamoD
 - Features: sequence, parallel, conditions, timeouts, error handling. etc
 - Provides a <b>visual graph</b> showing the current state and which path workflow has taken
 
-### Simple Wrokflow Service (SWF)
+### Simple Workflow Service (SWF)
 - Outdated service (step functions are preferred instead)
 - Code runs on EC2 (not serverless)
 - <b>Ensures that a task is never duplicated</b> (could replace standard SQS queues)
