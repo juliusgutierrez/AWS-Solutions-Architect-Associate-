@@ -2653,22 +2653,33 @@ Amazon Cognito lets you add user sign-up, sign-in, and access control to your we
   * Trigger Auto Scaling Action (ASG)
   * Send notification to SNS
 
-
 > EC2 Instance Recovery
+>
 > * CloudWatch alarm to automatically recover an EC2 instance if it becomes impaired
 > * Terminated instances cannot be recovered
 > * After the recovery, the following are retained
-> * Placement Group
-> * Public IP
-> * Private IP
-> * Elastic IP
-> * Instance ID
-> * Instance metadata
+>   * Placement Group
+>   * Public IP
+>   * Private IP
+>   * Elastic IP
+>   * Instance ID
+>   * Instance metadata
 > * After the recovery, RAM contents are lost
 
 ### CloudWatch Events
 * Schedule or Cron to create events on a schedule
 * Uses default event bus (custom & partner event buses are not supported)
+
+### CloudWatch Insights and Operational Visibility
+* **CloudWatch Container Insights**
+  * ECS, EKS, Kubernetes on EC2, Fargate, needs agent for Kubernetes 
+  * Metrics and logs
+* **CloudWatch Lambda Insights**
+  * Detailed metrics to troubleshoot serverless applications
+* **CloudWatch Contributors Insights**
+  * Find “Top-N” Contributors through CloudWatch Logs
+* **CloudWatch Application Insights**
+  * Automatic dashboard to troubleshoot your application and related AWS services
 
 ## CloudTrail
 * **Global Service** (a single trail can be applied to multiple regions)
@@ -2767,8 +2778,122 @@ from the one in which it is running. This enables you to publish data from vario
 * View usage for the **last 12 months & forecast up to 12 months**
 > AWS Cost Explorer helps you identify under-utilized EC2 instancess
 
+# Containerization
+## Elastic Container Service (ECS)
+* Used to launch Docker containers on AWS
+* Integrates with ALB for load balancing to ECS tasks
+* `EFS` is used as persistent multi-AZ shared storage for ECS tasks
 
-## Containerization
+![](images/containerize_data_vol.png)
+
+### Launch Types
+
+**EC2 Launch Type**
+* **Not Serverless**
+* Containers run on underlying EC2 instances
+* ECS takes care of launching & stopping containers (ECS tasks)
+* You must provision & maintain EC2 instances (use ASG)
+
+![](images/ecs.png)
+
+**Fargate Launch Type¶**
+* **Serverless**
+* No need to provision infrastructure
+* No need to worry about infrastructure scaling
+* ECS launches the required containers based on the CPU / RAM needed (we won’t know where these containers are running)
+
+![](images/containerize_fargate.png)
+
+## IAM Roles for ECS Tasks
+* **EC2 Instance Profile** (IAM role for the EC2 instance)
+  * Used by the ECS agent to:
+    * Make API calls to ECS service
+    * Send container logs to Cloud Watch
+    * Pull Docker image from ECR
+* **Task Execution Role**
+  * Allows ECS tasks to access AWS resources
+  * Each task can have a separate role
+  * **Use different roles for the different ECS Services**
+  * Task Role is defined in the task definition
+  * Use `taskRoleArn` parameter to assign IAM policies to ECS Task Execution Role
+  * Ex. Reference sensitive data in `Secrets Manager` or `SSM Parameter Store`
+
+### ECS Services
+* An ECS Service is a collection of ECS tasks that perform the same function
+* We can use ALB to send requests to these tasks
+* **Service CPU Usage** or the **SQS queue length** for a service are used for scaling
+
+![](images/containerize_load_balancer.png)
+
+### Load Balancing
+**EC2 Launch Type**
+* **Dynamic port is assigned randomly** to ECS tasks
+* Once the ALB is registered to a service in the ECS cluster, it will find the right port on the EC2 Instances
+* You must **allow on the EC2 instance’s security group any port from the ALB security group** because it may attach on any port
+
+**Fargate Launch Type**
+* **Each task has a unique IP but same port (80)**
+* You must allow on the ENI’s security group the task port (80) from the ALB security group
+
+### Rolling Updates
+* **Minimum healthy percentage** - determines how many tasks, running the current version, we can terminate while staying above the threshold
+* **Maximum percentage** - determines how many new tasks, running the new version, we can launch while staying below the threshold
+* Min: 50% and Max: 100% and starting number of tasks 4
+* Min: 100% and Max: 150% and starting number of tasks 4
+
+### Secrets in ECS tasks¶
+* Store the secrets in Parameter Store and encrypt them using KMS
+* Reference the secrets in container definition with the name of the environment variable
+* Create an **ECS task execution role** and reference it with your task definition, which allows access to both KMS and the Parameter Store/Secrets Manager.
+* Supported for both EC2 and Fargate launch types
+
+### Scaling ECS Tasks using EventBridge
+* You can use EventBridge (CloudWatch Events) to run Amazon ECS tasks when certain AWS events occur.
+* Ex: set up a CloudWatch Events rule that runs an Amazon ECS task whenever a file is uploaded to an S3 bucket. You can also declare a reduced number of ECS tasks whenever a file is deleted from the S3 bucket.
+
+### Troubleshooting Steps
+* Verify that the Docker daemon is running on the container instance.
+* Verify that the Docker Container daemon is running on the container instance.
+* Verify that the container agent is running on the container instance.
+* Verify that the IAM instance profile has the necessary permissions.
+
+
+## Elastic Kubernetes Service (EKS)
+* Used to launch Kubernetes (open-source) clusters on AWS
+* **Supports both EC2 and Fargate launch types**
+* Inside the EKS cluster, we have EKS nodes (EC2 instances) and EKS pods (tasks) within them. We can use a private or public load balancer to access these EKS pods.
+* Leverages a Container Storage Interface (CSI) compliant driver
+* Support for:
+  * Amazon EBS 
+  * Amazon EFS (works with Fargate)
+  * Amazon FSx for Lustre
+  * Amazon FSx for NetApp ONTAP
+
+![](images/containerize_eks.png)
+
+> CloudWatch Container Insights can be configured to view metrics and logs for an EKS cluster in the CloudWatch console
+
+### Use case
+* If your company is already using Kubernetes on-premises or in another cloud, and wants to migrate to AWS using Kubernetes
+
+### Elastic Container Registry (ECR)
+* AWS managed private Docker repository
+* **Pay for the storage you use** to store docker images (no provisioning)
+* Integrated with `ECS` & `IAM` for security
+* Storage backed by `S3`
+* Can upload Docker images on ECR manually or we can use a CICD service like CodeBuild
+
+## AWS App Runner
+* Fully managed service that makes it easy to deploy web applications and APIs at scale
+* No infrastructure experience required
+* Start with your source code or container image
+* Automatically builds and deploy the web app
+* Automatic scaling, highly available, load balancer, encryption
+* VPC access support
+* Connect to database, cache, and message queue services
+* Use cases: web apps, APIs, microservices, rapid production deployments
+
+![](images/containerize_app_runner.png)
 
 ## Deployment
 
