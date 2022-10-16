@@ -1246,15 +1246,14 @@ if disabled and the master node fails, need to promote a Read Replica as the new
 - <b>No Decentralization</b>
 
 ## Amazon Timestream
-- Fully managed, fast scalable, serverless time series database
-- Automatic scale up/down to adjust capacity
-- Store and analyze trillions of events per day
-- 1000s times faster & 1/10th cost of a relational database
-- Near realtime analytics
-- Encryption in transit and at rest (same as RDS)
-
-- Usage:
-  - IoT apps, operational applications, real-time analytics
+* Fully managed, fast scalable, serverless time series database
+* Automatic scale up/down to adjust capacity
+* Store and analyze trillions of events per day
+* 1000s times faster & 1/10th cost of a relational database
+* Near realtime analytics
+* Encryption in transit and at rest (same as RDS)
+* Usage:
+  * IoT apps, operational applications, real-time analytics
 
 ## FSx
 - Allows us to launch 3rd party high-performance file system on AWS
