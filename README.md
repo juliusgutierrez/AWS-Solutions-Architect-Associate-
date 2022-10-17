@@ -2894,7 +2894,91 @@ from the one in which it is running. This enables you to publish data from vario
 
 ![](images/containerize_app_runner.png)
 
-## Deployment
+# Deployment
+## CloudFormation
+* **Infrastructure as Code (IaC)** allows us to write our infrastructure as a config file which can be easily replicated & versioned using Git
+* **Declarative** way of outlining your AWS Infrastructure (no need to specify ordering and orchestration)
+* Resources within a stack is tagged with an identifier (easy to track cost of each stack)
+* Ability to destroy and re-create infrastructure on the fly
+* Deleting a stack deletes every single artifact that was created by CloudFormation (clean way of deleting resources)
+
+### CloudFormation Templates
+* YAML file that defines a CloudFormation Stack
+* **Templates have to be uploaded in S3** and then referenced in CloudFormation
+* To update a template, upload a new version of the template
+* Template components:
+  * **Resources**: AWS resources declared in the template (mandatory)
+  * Parameters: Dynamic inputs for your template
+  * Mappings: Static variables for your template
+  * Outputs: References to what has been created (will be returned upon stack creation)
+  * Conditionals: List of conditions to perform resource creation
+  * Metadata
+* Templates helpers:
+  * References
+  * Functions
+> * You can associate the `CreationPolicy` attribute with a resource to prevent its status from reaching create complete 
+> until CloudFormation receives a specified number of `cfn-signal` or the timeout period is exceeded.
+> * Use CloudFormation with securely configured templates to ensure that applications are deployed in secure configurations
+
+### Stack Sets
+* Create, update, or delete stacks across **multiple accounts and regions** with a single operation
+* When you update a stack set, all associated stack instances are updated throughout all accounts and regions.
+
+### Updating Stacks
+* CloudFormation provides two methods for updating stacks:
+* **Direct update**
+  * CloudFormation immediately deploys the submitted changes. You cannot preview the changes.
+* **Change Sets**
+  * You can preview the changes CloudFormation will make to your stack, and then decide whether to apply those changes.
+
+## Elastic Beanstalk
+* Used to **deploy applications** on AWS infrastructure
+* **Platform as a Service (PaaS)**
+* Automatically handles capacity provisioning, load balancing, scaling, application health monitoring, instance configuration, etc. 
+but **we have full control over the configuration**
+* **Free** (pay for the underlying resources)
+* Supports versioning of application code
+* Can create multiple environment (dev, test, prod)
+* Supports the deployment of web applications from Docker containers and automatically handles load balancing, auto-scaling, monitoring, and placing containers across the cluster.
+
+### Web & Worker Environments
+* Web Environment (Web Server Tier): clients requests are directly handled by EC2 instances through a load balancer.
+* Worker Environment (Worker Tier): clients’s requests are put in a SQS queue and the EC2 instances will pull the messages to process them. Scaling depends on the number of SQS messages in the queue.
+
+![](images/deployment_elastic_bean_stalk.png)
+
+## Serverless Application Model (SAM)
+* Extension of CloudFormation
+* **Framework for developing and deploying serverless applications**
+* Configuration is **YAML**
+* Can run Lambda, API Gateway, DynamoDB locally for development and debugging
+* Can use **CodeDeploy** to deploy Lambda functions
+
+### Continuous Integration Continuous Delivery (CICD)
+* **Continuous Integration**
+  * Developers push the code to a code repository often (GitHub / CodeCommit / Bitbucket)
+  * A testing / build server checks the code as soon as it’s pushed (CodeBuild / Jenkins CI)
+  * The developer gets feedback about the tests and checks that have passed / failed
+  * Deliver faster as the code is tested automatically
+* **Continuous Delivery**
+  * Ensure that the software can be released reliably whenever needed
+  * Ensures deployments happen often and are quick
+  * Automated deployment using CodeDeploy, Jenkins CD, etc.
+* **Technology Stack for CICD**
+  * `AWS CodeCommit` is a fully managed code repository.
+  * `AWS CodeBuild` is a fully managed continuous integration (CI) service that compiles source code, runs tests, and produces software packages that are ready to deploy. It is an alternative to Jenkins.
+  * `AWS CodeDeploy` is a fully managed deployment service that automates software deployments to a variety of computing services such as EC2, Fargate, Lambda, and your on-premises servers. You can define the strategy you want to execute such as in-place or blue/green deployments.
+  * Used to deploy application, not infrastructure (use CloudFormation for that)
+  * `AWS CodePipeline` is a fully managed continuous delivery (CD) service that helps you automate your release pipeline for fast and reliable application and infrastructure updates. It automates the build, test, and deploy phases of your release process every time there is a code change. It has direct integration with Elastic Beanstalk.
+
+![](images/deployment_cicd.png)
+
+## Blue-Green Deployment
+* Blue-green deployment is a technique to test features in the new environment without impacting the currently running version of your application
+  * **Blue** - current version
+  * **Green** - new version
+* When you’re satisfied that the green version is working properly, you can gradually reroute the traffic from the old blue environment to the new green environment.
+* Can mitigate common risks associated with deploying software, such as downtime and **rollback** capability.
 
 ## Parameters 
 
