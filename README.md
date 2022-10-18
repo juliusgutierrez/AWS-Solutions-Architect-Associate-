@@ -2980,7 +2980,112 @@ but **we have full control over the configuration**
 * When you’re satisfied that the green version is working properly, you can gradually reroute the traffic from the old blue environment to the new green environment.
 * Can mitigate common risks associated with deploying software, such as downtime and **rollback** capability.
 
-## Parameters 
+## Parameters
+
+# Encryption
+
+## Key Management Service (KMS)
+* **Regional service (keys are bound to a region)**
+* Provides encryption and decryption of data and manages keys required for it
+* Encrypted secrets can be stored in the code or environment variables
+* **Encrypt up to 4KB of data per call (if data > 4 KB, use envelope encryption)**
+* Integrated with lAM for authorization
+* Audit key usage with CloudTrail
+* Need to set **IAM Policy & Key Policy** to allow a user or role to access a KMS key
+### Customer Master Key (CMK)
+* **Symmetric keys** (necessary for envelope encryption)
+* **Must call KMS API to encrypt data**
+* Two types:
+  * **AWS Owned CMK** (free)
+    * Default KMS key for each supported service
+    * Fully managed by AWS (cannot view, rotate or delete them)
+  * Customer Owned CMK (1$/month)
+    * **AWS Managed CMK**
+      * Generated in KMS
+      * Option to enable automatic yearly rotation
+    * **Customer Managed CMK**
+      * Generated and imported from outside
+      * Must be 256-bit symmetric key
+      * Not recommended
+      * Deletion has a waiting period (pending deletion state) between 7 - 30 days (default 30 days). The key can be recovered during the pending deletion state.
+
+### Asymmetric Keys
+* Public (Encrypt) and Private Key (Decrypt) pair
+* Used for Encrypt/Decrypt, or Sign/Verify operations
+* The public key is downloadable, but you can’t access the Private Key unencrypted
+* **No need to call the KMS API to encrypt data** (data can be encrypted by the client)
+* **Not eligible for automatic rotation** (use manual rotation)
+* Use case: encryption outside of AWS by users who can’t call the KMS API
+
+### Key Policies
+* Cannot access KMS keys without a key policy
+* **Default Key Policy**
+  * Created if you don’t provide a specific Key Policy
+  * Complete access to the key for the root user ⇒ any user or role can access the key (most permissible)
+* **Custom Key Policy**
+  * Define users, roles that can access the KMS key
+  * Define who can administer the key
+  * Useful for cross-account access of your KMS key
+
+### Cross-region Encrypted Snapshot Migration
+- Copy the snapshot to another region with re-encryption option using a new key in the new region (keys are bound to a region)
+
+
+### Cross-account Encrypted Snapshot Migration
+- Attach a Key Policy to the main CMK to authorize access to an IAM role in the target account (cross-account access)
+
+![](images/pe_kms.png)
+* Share the encrypted snapshot with the new account
+* In the target account, create a copy of the snapshot (decryption will use the main CMK)
+* Encrypt it with a new KMS Key in your account
+
+### Key Rotation
+* **Automatic**
+  * Supported only in Customer-owned CMK
+  * Automatic yearly key rotation
+  * Previous key is kept active (to decrypt old data)
+  * New key has the same CMK ID (only the backing key is changed)
+
+<img src="images/pe_kms_auto.png" width="60%"/>
+
+* **Manual**
+  * **New Key has a different CMK ID**
+  * Keep the previous key active to decrypt old data
+  * Use aliases as CMK id changes after rotation (to hide the key change for the application). After rotation, use UpdateAlias API to point the alias to the new key.
+  * **Good for asymmetric keys** (automatic rotation not supported)
+
+<img src="images/pe_kms_manual.png" width="60%"/>
+
+
+### KMS Multi Regions Keys
+* Identical KMS keys in different AWS Regions that can be used interchangeably
+* Multi-Region keys have the same key ID, key material, automatic rotation... • Encrypt in one Region and decrypt in other Regions
+* No need to re-encrypt or making cross-Region API calls • KMS Multi-Region are NOT global (Primary + Replicas)
+* Each Multi-Region key is managed independently
+> Use cases: global client-side encryption, encryption on Global DynamoDB, Global Aurora
+
+![](images/pe_kms_multi_region.png)
+
+### S3 Replication with Encryption
+* Unencrypted objects and objects encrypted with SSE-S3 are replicated by default
+* Objects encrypted with SSE-C (customer provided key) are never replicated
+* For objects encrypted with SSE-KMS, you need to enable the option
+  * Specify which KMS Key to encrypt the objects within the target bucket
+  * Adapt the KMS Key Policy for the target key
+  * An IAM Role with kms:Decrypt for the source KMS Key and kms:Encrypt for the target KMS Key 
+  * You might get KMS throttling errors, in which case you can ask for a Service Quotas increase
+* You can use multi-region AWS KMS Keys, but they are currently treated as independent keys 
+by Amazon S3 (the object will still be decrypted and then encrypted)
+
+### AMI Sharing Process Encrypted via KMS
+1. AMI in Source Account is encrypted with KMS Key from Source Account
+2. Must modify the image attribute to add a Launch Permission which corresponds to the specified target AWS account
+3. Must share the KMS Keys used to encrypted the snapshot the AMI references with the target account / IAM Role
+4. The IAM Role/User in the target account must have the permissions to DescribeKey, ReEncrypted, CreateGrant, Decrypt
+5. When launching an EC2 instance from the AMI, optionally the target account can specify a new KMS key in its own account to re-encrypt the volumes
+
+![](images/pe_kms_ami_sharing.png)
+
 
 ## Encryption
 
