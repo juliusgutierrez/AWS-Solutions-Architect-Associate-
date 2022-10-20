@@ -3086,6 +3086,29 @@ by Amazon S3 (the object will still be decrypted and then encrypted)
 
 ![](images/pe_kms_ami_sharing.png)
 
+## SSM Parameter Store
+* Serverless
+* Used to store parameters & secrets
+* Parameter versioning
+* Seamless Encryption with KMS for encryption and decryption of stored secrets
+* Parameters are stored in hierarchical fashion
+
+### Tiers
+
+|                          | Standard Tier | Advance Tier |
+|--------------------------|---------------|--------------|
+| Number of parameters	    | 10,000        | 100,000      |
+| Max parameter size	      | 4KB           | 8KB          |
+| Parameter Policy	        | Not Supported | Supported    |
+| Cost                     | Free          | Paid         |
+
+### Parameter Policies
+* Only supported in advanced tier
+* Assign policies to a parameter for additional features
+* Expire the parameter after some time (TTL)
+* Parameter expiration notification
+* Parameter change notification
+
 
 ## Encryption
 
