@@ -3137,7 +3137,42 @@ by Amazon S3 (the object will still be decrypted and then encrypted)
 * It’s an **alternative to AWS SSM**
 > Exam tip: **Chef & Puppet ⇒ AWS OpsWorks**
 
-## Analytics
+# Analytics
+
+## Athena
+* **Serverless** query service to perform analytics on S3
+* Uses **SQL language** to query the files
+* **Runs directly on S3** (no copying needed)
+* Output stored in S3
+* Built on **Presto** engine
+* Supports CSV, JSON, ORC, AVI and Parquet file formats
+> Use compressed or columnar data for cost-savings (due to less scan)
+> Can be used along with AWS Transcribe (automatic speech recognition service that converts audio to text) to analyze audio for sentiment analysis.
+
+## Elastic Map Reduce (EMR)
+* Used to create **Big Data clusters** to **analyze and process** vast amounts of data
+* Uses **Hadoop**, an open-source framework, to distribute your data and processing across a **cluster of 100s of EC2 instances.**
+* Supports open-source tools such as **Apache Spark, HBase, Presto, Flink,** etc.
+* EMR takes care of all the provisioning and configuration
+* **Auto-scaling**
+* Integrated with **Spot Instances**
+* Can be used to process large amounts of log files
+
+## Glue
+* Serverless Extract, Transform & Load (ETL) service
+* Used to prepare & transform data for analytics
+
+![](images/glue.png)
+
+* Used to get data from a store, process and put it in another store (could be the same store)
+> Glue ETL job can write the transformed data using a compressed file format to save storage cost
+> 
+> Using Glue involves significant development efforts to write custom migration scripts to copy the database data into the target database.
+
+### Glue Data Catalog
+* **Glue Data Crawlers** crawl databases and collect metadata which is populated in **Glue Data Catalog**
+* Metadata can be used for analytics
+
 
 ## Security
 
