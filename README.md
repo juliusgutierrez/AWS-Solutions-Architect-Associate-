@@ -2795,7 +2795,7 @@ from the one in which it is running. This enables you to publish data from vario
 
 ![](images/ecs.png)
 
-**Fargate Launch Type¶**
+**Fargate Launch Type**
 * **Serverless**
 * No need to provision infrastructure
 * No need to worry about infrastructure scaling
@@ -3136,6 +3136,58 @@ by Amazon S3 (the object will still be decrypted and then encrypted)
 * They work great with EC2 & On Premise VM
 * It’s an **alternative to AWS SSM**
 > Exam tip: **Chef & Puppet ⇒ AWS OpsWorks**
+
+## AWS Certificate Manager (ACM)
+
+* Easily provision, manage, and deploy TLS Certificates
+* Provide in-flight encryption for websites (HTTPS)
+* Supports both public and privateTLS certificates
+* Free of charge for publicTLS certificates
+* Automatic TLS certificate renewal
+* Integrations with (loadTLS certificates on)
+  * ElasticLoadBalancers(CLB,ALB,NLB)
+  * CloudFront Distributions
+  * APIs on API Gateway
+* Option to generate the certificate
+* outside of ACM and then import it
+* No automatic renewal, must import a new certificate before expiry
+* ACM sends daily expiration events starting 45 days prior to expiration
+* The # of days can be configured
+* Events are appearing in EventBridge
+* AWS Config has a managed rule named acm-certificate-expiration-check to check for expiring certificates (configurable number of days)
+
+### API GateWay - Endpoint Types
+* **Edge-Optimized (default):** For global clients
+  * Requests are routed through the CloudFront Edge locations (improves latency)
+  * The API Gateway still lives in only one region
+* **Regional:**
+  * For clients within the same region
+  * Could manually combine with CloudFront (more control over the caching strategies and the distribution)
+* **Private:**
+  * Can only be accessed from your VPC using an interface VPC endpoint (ENI)
+  * Use a resource policy to define access
+
+![](images/acm_api_integration.png)
+
+
+## Firewall Manager
+* Manage rules in all accounts of an AWS Organization
+* Security policy: common set of security rules
+* WAF rules (Application Load Balancer, API Gateways, CloudFront)
+* AWS Shield Advanced (ALB, CLB, NLB, Elastic IP, CloudFront)
+* Security Groups for EC2, Application Load Balancer and ENI resources in VPC
+* AWS Network Firewall (VPC Level)
+* Amazon Route 53 Resolver DNS Firewall
+* Policies are created at the region level
+* Rules are applied to new resources as they are created (good for compliance) across all and future accounts in your Organization
+
+### WAF vs. Firewall Manager vs. Shield
+* WAF, Shield and Firewall Manager are used together for comprehensive protection
+* Define your Web ACL rules in WAF
+* For granular protection of your resources,WAF alone is the correct choice
+* If you want to use AWS WAF across accounts, accelerate WAF configuration, automate the protection of new resources, use Firewall Manager with AWS WAF
+* Shield Advanced adds additional features on top of AWS WAF, such as dedicated support from the Shield ResponseTeam (SRT) and advanced reporting.
+* If you’re prone to frequent DDoS attacks, consider purchasing Shield Advanced
 
 # Analytics
 
