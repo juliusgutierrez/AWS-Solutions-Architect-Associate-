@@ -2982,7 +2982,7 @@ but **we have full control over the configuration**
 
 ## Parameters
 
-# Encryption
+# Encryption & Encryption
 
 ## Key Management Service (KMS)
 * **Regional service (keys are bound to a region)**
@@ -3095,12 +3095,12 @@ by Amazon S3 (the object will still be decrypted and then encrypted)
 
 ### Tiers
 
-|                          | Standard Tier | Advance Tier |
-|--------------------------|---------------|--------------|
-| Number of parameters	    | 10,000        | 100,000      |
-| Max parameter size	      | 4KB           | 8KB          |
-| Parameter Policy	        | Not Supported | Supported    |
-| Cost                     | Free          | Paid         |
+|                        | Standard Tier | Advance Tier |
+|------------------------|---------------|--------------|
+| Number of parameters	  | 10,000        | 100,000      |
+| Max parameter size	    | 4KB           | 8KB          |
+| Parameter Policy	      | Not Supported | Supported    |
+| Cost                   | Free          | Paid         |
 
 ### Parameter Policies
 * Only supported in advanced tier
@@ -3109,8 +3109,33 @@ by Amazon S3 (the object will still be decrypted and then encrypted)
 * Parameter expiration notification
 * Parameter change notification
 
+## Secrets Manager
+* For storing secrets only
+* Ability to force rotation of secrets every n days (not available in Parameter Store)
+* A secret consists of multiple key-value pairs
+* Secrets are encrypted using KMS
+* Mostly used for RDS authentication
+  * need to specify the username and password to access the database
+  * link the secret to the database to allow for automatic rotation of database login info
+* Can create custom secrets
 
-## Encryption
+## CloudHSM
+* AWS provisions **dedicated encryption hardware** (Hardware Security Module)
+* Use when you want to manage encryption keys completely
+* HSM device is stored in AWS (tamper resistant, FIPS 140-2 Level 3 compliance)
+* **Supports both symmetric and asymmetric encryption**
+* Good option to use with **SSE-C encryption**
+* CloudHSM clusters are spread across **Multi AZ (high availability)**
+* **Redshift supports CloudHSM** for database encryption and key management
+* IAM permissions are required to perform CRUD operations on HSM cluster
+* **CloudHSM Software** is used to manage the keys and users (in KMS, everything is managed using IAM)
+
+## OpsWorks
+* **Chef & Puppet** are two open-source softwares that help you perform **server configuration** automatically, or repetitive actions
+* AWS OpsWorks is nothing but **AWS Managed Chef & Puppet**
+* They work great with EC2 & On Premise VM
+* It’s an **alternative to AWS SSM**
+> Exam tip: **Chef & Puppet ⇒ AWS OpsWorks**
 
 ## Analytics
 
