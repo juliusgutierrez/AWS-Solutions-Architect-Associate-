@@ -1599,7 +1599,7 @@ if the user should be allowed to access the resource.
 - Cannot be used as a bastion host
 - `Route Tables` for private subnets must be configured to route internet destined traffic to the NAT Gateway
 - No Security groups to manage
-- Pay pey hour
+- Pay per hour
 
 ![](images/vpc_nat_gateway.png)
 
