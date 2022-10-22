@@ -3003,7 +3003,7 @@ but **we have full control over the configuration**
 
 ## Parameters
 
-# Encryption & Encryption
+# Encryption & Parameters
 
 ## Key Management Service (KMS)
 * **Regional service (keys are bound to a region)**
@@ -3190,26 +3190,6 @@ by Amazon S3 (the object will still be decrypted and then encrypted)
 
 ![](images/acm_api_integration.png)
 
-
-## Firewall Manager
-* Manage rules in all accounts of an AWS Organization
-* Security policy: common set of security rules
-* WAF rules (Application Load Balancer, API Gateways, CloudFront)
-* AWS Shield Advanced (ALB, CLB, NLB, Elastic IP, CloudFront)
-* Security Groups for EC2, Application Load Balancer and ENI resources in VPC
-* AWS Network Firewall (VPC Level)
-* Amazon Route 53 Resolver DNS Firewall
-* Policies are created at the region level
-* Rules are applied to new resources as they are created (good for compliance) across all and future accounts in your Organization
-
-### WAF vs. Firewall Manager vs. Shield
-* WAF, Shield and Firewall Manager are used together for comprehensive protection
-* Define your Web ACL rules in WAF
-* For granular protection of your resources,WAF alone is the correct choice
-* If you want to use AWS WAF across accounts, accelerate WAF configuration, automate the protection of new resources, use Firewall Manager with AWS WAF
-* Shield Advanced adds additional features on top of AWS WAF, such as dedicated support from the Shield ResponseTeam (SRT) and advanced reporting.
-* If you’re prone to frequent DDoS attacks, consider purchasing Shield Advanced
-
 # Analytics
 
 ## Athena
@@ -3247,7 +3227,89 @@ by Amazon S3 (the object will still be decrypted and then encrypted)
 * Metadata can be used for analytics
 
 
-## Security
+# Cloud Security
+
+## AWS Shield
+* **Shield Standard**
+  * Free service that is activated for every AWS customer
+  * Provides protection from **SYN/UDP Floods, Reflection attacks and other layer 3 & layer 4 attacks**
+* **Shield Advanced**
+* **DDoS mitigation** service ($3,000 per month per organization)
+* Protect against more sophisticated attacks on
+  * EC2 instances
+  * Elastic Load Balancing (ELB)
+  * CloudFront
+  * Global Accelerator
+  * Route 53
+* 24/7 access to **AWS DDoS Response (DRP) team**
+* Get reimbursed for usage spikes due to DDoS
+
+## Web Application Firewall (WAF)
+* Protects your application from common **layer 7 web exploits** such as **SQL Injection** and **Cross-Site Scripting (XSS)**
+* Layer 7 has more data about the structure of the incoming request than layer 4 (used by AWS Shield)
+* Can only be deployed on
+  * Application Load Balancer
+  * API Gateway
+  * CloudFront
+* WAF contains **Web ACL (Access Control List)** containing rules to **filter requests** based on:
+  * IP addresses
+  * HTTP headers
+  * HTTP body
+  * URI strings
+  * Size constraints (ex. max 5kb)
+  * Geo-match (block countries)
+  * Rate-based rules (to count occurrences of events per IP) for DDoS protection
+
+## Firewall Manager
+* **Manage firewall across all the accounts of an AWS Organization**
+  * Web Application Firewall (WAF)
+  * AWS Shield
+  * Security Groups
+  * AWS Network Firewall (VPC Level)
+  * Route 53
+  * Policies that are create at the region level
+> Rules are applied to new resources as they are created (good for compliance) across all and future accounts in your Organization
+
+### WAF vs. Firewall Manager vs. Shield
+* WAF, Shield and Firewall Manager are used together for comprehensive protection
+* Define your Web ACL rules in WAF
+* For granular protection of your resources,WAF alone is the correct choice
+* If you want to use AWS WAF across accounts, accelerate WAF configuration, automate the protection of new resources, use Firewall Manager with AWS WAF
+* Shield Advanced adds additional features on top of AWS WAF, such as dedicated support from the Shield ResponseTeam (SRT) and advanced reporting.
+* If you’re prone to frequent DDoS attacks, consider purchasing Shield Advanced
+
+## GuardDuty
+* Intelligent **threat discovery** using ML to protect AWS account
+* No management required (just enable)
+* Monitors:
+  * `CloudTrail Logs` (unusual API calls, unauthorized deployments)
+  * `VPC Flow Logs` (unusual internal traffic, unusual IP address)
+  * `DNS Logs` (compromised EC2 instances sending encoded data within DNS queries)
+  * `EKS Audit Logs` (suspicious activities and potential EKS cluster compromises)
+* Setup CloudWatch Event rules to target AWS Lambda or SNS for automation
+>Features a dedicated finding for Crypto attacks
+>
+>Disabling GuardDuty will delete all remaining data, including your findings and configurations
+
+![](images/guard_duty.png)
+
+## Inspector
+* **Detect vulnerabilities** in
+  * EC2 instances using System Manager (SSM) Agent running on EC2 instances
+  * Amazon ECR - Assessment of containers as they are pushed to ECR
+* Integration with **AWS Security Hub**
+* Send findings to `EventBridge`
+* Gives a risk score associated with all vulnerabilities for prioritization
+* Detects vulnerabilities which could cause threats (detected by `GuardDuty`)
+
+##  Macie
+* Amazon Macie is a data security and data privacy service that uses machine learning and pattern 
+matching to discover and protect your sensitive data in AWS, such as `Personally Identifiable Information (PII)` 
+in an `S3 bucket`.
+* No management required (just enable)
+* Notifies through an `EventBridge` event
+
+![](images/macie.png)
 
 ## Disaster Recovery
 
