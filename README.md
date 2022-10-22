@@ -1636,7 +1636,7 @@ if the user should be allowed to access the resource.
 - NACL are a firewall at the subnet level
 - One NACL per subnet but a NACL can be attached to multiple subnets
 - New Subnets are assigned the Default NACL
-- Default NACL allows all inboard & outbound requests
+- Default NACL allows all inbound & outbound requests
 - NACL Rules
   - Rules number: 1-32777 (lower number has higher precedence)
   - First rule match will drive the decision
