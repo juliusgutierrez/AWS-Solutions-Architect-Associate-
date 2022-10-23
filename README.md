@@ -1971,12 +1971,12 @@ Failed messages (after the set number of retries) are sent to the DLQ by the SQS
 * Pub-Sub model (publisher publishes messages to a topic, subscribers listen to the topic)
 * Instant message delivery (does not queue messages)
 * Subscribers can be:
-* SQS queues
-* HTTP / HTTPS endpoints
-* Lambda functions
-* Emails (using SNS)
-* SMS messages
-* Mobile Notifications
+  * SQS queues
+  * HTTP / HTTPS endpoints
+  * Lambda functions
+  * Emails (using SNS)
+  * SMS messages
+  * Mobile Notifications
 
 ### Encryption
 * In-flight encryption by default using HTTPS API
