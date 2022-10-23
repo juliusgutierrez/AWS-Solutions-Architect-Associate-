@@ -1690,7 +1690,7 @@ if the user should be allowed to access the resource.
 - Enable IPv6 to operate in <b>dual-stack mode</b> in which your EC2 instances will get at least a <b>private IPv4</b> and a <b>public IPv6</b>. 
 They can communicate using either IPv4 or IPv6 to the internet through an Internet Gateway
 - If you cannot launch an EC2 instance in your subnet, Its not because it cannot acquire an IPv6 (the space is very large).
-It's because there are no available IPv4 in you subnet.
+It's because there are no available IPv4 in your subnet.
 <b>Solution: create a new IPv4 CIDR in your subnet</b>
 
 ### Egress-only Internet Gateway
