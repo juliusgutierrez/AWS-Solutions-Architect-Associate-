@@ -2535,8 +2535,8 @@ Amazon Cognito lets you add user sign-up, sign-in, and access control to your we
 
 ### Signed URL / Cookies
 * Used to **make a CloudFront distribution private** (distribute to a subset of users)
-* Signed URL ⇒ access to individual files
-* Signed Cookies ⇒ access to multiple files
+* Signed URL ⮕ access to individual files
+* Signed Cookies ⮕ access to multiple files
 * Whenever we create a signed URL / cookie, we attach a policy specifying:
   * URL / Cookie Expiration (TTL)
   * IP ranges allowed to access the data
