@@ -2597,7 +2597,7 @@ Amazon Cognito lets you add user sign-up, sign-in, and access control to your we
 
 ## CloudWatch
 - Serverless performance monitoring service
-### Metrics
+### CloudWatch Metrics
   * Variables to monitor in CloudWatch
     * Dimension is an attribute of a metric (instance id, environment, etc.)
     * Up to 10 dimensions per metric
@@ -2633,11 +2633,11 @@ Amazon Cognito lets you add user sign-up, sign-in, and access control to your we
       * Processes (total, dead, bloqued, idle, running, sleep)
       * Swap Space (free, used, used %)
 
-### Dashboards
+### CloudWatch Dashboards
 * Setup custom dashboards for quick access to key metrics and alarms
 * Dashboards are global (allows to monitor services across accounts & regions)
 * Dashboards can be shared with people who don’t have an AWS account (public, email address, 3rd party SSO provider through Cognito)
-### Logs
+### CloudWatch Logs
 * Used to store application logs
 * Logs Expiration: never expire, 30 days, etc.
 * Logs can be sent to:
