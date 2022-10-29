@@ -2861,7 +2861,7 @@ from the one in which it is running. This enables you to publish data from vario
 * Min: 50% and Max: 100% and starting number of tasks 4
 * Min: 100% and Max: 150% and starting number of tasks 4
 
-### Secrets in ECS tasks¶
+### Secrets in ECS tasks
 * Store the secrets in Parameter Store and encrypt them using KMS
 * Reference the secrets in container definition with the name of the environment variable
 * Create an **ECS task execution role** and reference it with your task definition, which allows access to both KMS and the Parameter Store/Secrets Manager.
@@ -3234,15 +3234,15 @@ by Amazon S3 (the object will still be decrypted and then encrypted)
   * Free service that is activated for every AWS customer
   * Provides protection from **SYN/UDP Floods, Reflection attacks and other layer 3 & layer 4 attacks**
 * **Shield Advanced**
-* **DDoS mitigation** service ($3,000 per month per organization)
-* Protect against more sophisticated attacks on
-  * EC2 instances
-  * Elastic Load Balancing (ELB)
-  * CloudFront
-  * Global Accelerator
-  * Route 53
-* 24/7 access to **AWS DDoS Response (DRP) team**
-* Get reimbursed for usage spikes due to DDoS
+  * **DDoS mitigation** service ($3,000 per month per organization)
+  * Protect against more sophisticated attacks on
+    * EC2 instances
+    * Elastic Load Balancing (ELB)
+    * CloudFront
+    * Global Accelerator
+    * Route 53
+  * 24/7 access to **AWS DDoS Response (DRP) team**
+  * Get reimbursed for usage spikes due to DDoS
 
 ## Web Application Firewall (WAF)
 * Protects your application from common **layer 7 web exploits** such as **SQL Injection** and **Cross-Site Scripting (XSS)**
