@@ -3369,6 +3369,35 @@ in an `S3 bucket`.
   * Inadvertent or malicious delete operations
   * Updates that shorten or alter retention periods
 
+
+## AWS Application Discovery Service
+* Plan migration projects by gathering information about on-premises data centers
+* Server utilization data and dependency mapping are important for migrations
+* **Agentless Discovery (AWS Agentless Discovery Connector)**
+  * VMinventory,configuration,andperformancehistorysuchasCPU,memory,anddiskusage
+* **Agent-based Discovery (AWS Application Discovery Agent)**
+  * System configuration, system performance, running processes, and details of the network connections between systems
+* Resulting data can be viewed within AWS Migration Hub
+
+## AWS Application Migration Service (MGN)
+* The “AWS evolution” of CloudEndure Migration, replacing AWS Server Migration Service (SMS)
+* Lift-and-shift (rehost) solution which simplify migrating applications to AWS
+* Converts your physical, virtual, and cloud-based servers to run natively on AWS
+* Supports wide range of platforms, Operating Systems, and databases
+* Minimal downtime, reduced costs
+
+![](images/aws_mgm.png)
+
+## VMware Cloud on AWS
+* Some customers use VMware Cloud to manage their on-premises Data Center
+* They want to extend the Data Center capacity to AWS, but keep using the VMware Cloud software ...EnterVMwareCloudonAWS
+* Use cases
+  * Migrate your VMware vSphere-based workloads to AWS
+  * Run your production workloads across VMware vSphere-based private, public, and hybrid cloud environments
+  * Have a disaster recover strategy
+
+![](images/aws_vmware.png)
+
 # Other Services
 ## Amazon Simple Email Service (Amazon SES)
 * Fully managed service to send emails securely, globally and at scale
