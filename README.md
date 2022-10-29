@@ -3311,6 +3311,172 @@ in an `S3 bucket`.
 
 ![](images/macie.png)
 
-## Disaster Recovery
+# Disaster Recovery
 
-## Extras
+* Any event that has a negative impact on a company’s business continuity or finances is a disaster
+* Recovery Point Objective (RPO): how often you backup your data (determines how much data are you willing to lose in case of a disaster)
+* Recovery Time Objective (RTO): how long it takes to recover from the disaster (down time)
+
+## Strategies
+* **Backup & Restore**
+  * High RPO (hours)
+  * Need to spin up instances and restore volumes from snapshots in case of disaster => High RTO
+  * Cheapest & easiest to manage
+
+![](images/dr_rpo_rto.png)
+
+* **Pilot Light**
+  * Critical parts of the app are always running in the cloud (eg. continuous replication of data to another region)
+  * Low RPO (minutes)
+  * Critical systems are already up => Low RTO
+  * Ideal when RPO should be in minutes and the solution should be inexpensive
+  * DB is critical so it is replicated continuously but EC2 instance is spin up only when a disaster strikes
+  
+![](images/dr_pilot_light.png)
+
+* **Warm Standby**
+  * A complete backup system is up and running at the minimum capacity. This system is quickly scaled to production capacity in case of a disaster.
+  * Very low RPO & RTO (minutes)
+  * Expensive
+  * Multi-Site or Hot Site Approach¶
+  * A backup system is running at full production capacity and the request can be routed to either the main or the backup system.
+  * Multi-data center approach
+  * Lowest RPO & RTO (minutes or seconds)
+  * Very Expensive
+![](images/dr_warm.png)
+
+## AWS Backup
+* Centrally manage and automate backups of AWS services across regions and accounts
+* On-Demand and Scheduled backups
+* Supported services:
+  * EC2 / EBS
+  * S3
+  * RDS / Aurora / DynamoDB
+  * DocumentDB / Neptune
+  * EFS / FSx (Lustre & Windows)
+  * Storage Gateway (Volume Gateway)
+
+## Backup Vault
+* WORM (Write Once Read Many) model for backups
+* Even the root user cannot delete backups
+* Additional layer of defense to protect your backups against:
+  * Inadvertent or malicious delete operations
+  * Updates that shorten or alter retention periods
+
+# Other Services
+## Amazon Simple Email Service (Amazon SES)
+* Fully managed service to send emails securely, globally and at scale
+* Allows inbound/outbound emails
+* Reputation dashboard, performance insights, anti-spam feedback
+* Provides statistics such as email deliveries, bounces, feedback loop results, email open
+* Supports DomainKeys Identified Mail (DKIM) and Sender Policy Framework (SPF)
+* Flexible IP deployment: shared, dedicated, and customer-owned IPs
+* Send emails using your application using AWS Console, APIs, or SMTP
+* Use cases: transactional, marketing and bulk email communications
+
+![](images/aws_ses.png)
+
+## Amazon Pinpoint
+* Scalable 2-way (outbound/inbound) marketing communications service
+* Supports email, SMS, push, voice, and in-app messaging
+* Ability to segment and personalize messages with the right content to customers
+* Possibility to receive replies
+* Scales to billions of messages per day
+* Use cases: run campaigns by sending marketing, bulk, transactional SMS messages
+* Versus Amazon SNS or Amazon SES
+* In SNS & SES you managed each message's audience, content, and delivery schedule
+* InAmazonPinpoint,youcreatemessagetemplates, delivery schedules, highly-targeted segments, and full campaigns
+
+![](images/aws_pinpoint.png)
+
+
+## Systems Manager – SSM Session Manager
+* Allows you to start a secure shell on your EC2 and on-premises servers
+* No SSH access, bastion hosts, or SSH keys needed
+* No port 22 needed (better security)
+* Supports Linux, macOS, and Windows
+* Send session log data to S3 or CloudWatch Logs
+
+![](images/aws_sm.png)
+
+## ElasticTranscoder
+* ElasticTranscoder is used to convert media files stored in S3 into media files in the formats required by consumer playback devices (phones etc..)
+* Benefits:
+  * Easy to use
+  * Highly scalable – can handle large volumes of media files and large file sizes
+  * Cost effective – duration-based pricing model
+  * Fully managed & secure, pay for what you use
+
+![](images/aws_transcoding.png)
+
+## AWS Batch
+* Fully managed batch processing at any scale
+* Efficiently run 100,000s of computing batch jobs on AWS
+* A “batch” job is a job with a star t and an end (opposed to continuous) • Batch will dynamically launch EC2 instances or Spot Instances
+* AWS Batch provisions the right amount of compute / memory
+* You submit or schedule batch jobs and AWS Batch does the rest!
+* Batch jobs are defined as Docker images and run on ECS
+* Helpful for cost optimizations and focusing less on the infrastructure
+
+![](images/aws_batch.png)
+
+### Batch vs Lambda
+* Lambda:
+  * Time limit
+  * Limited runtimes
+  * Limited temporary disk space • Serverless
+* Batch:
+  * No time limit
+  * Any runtime as long as it’s packaged as a Docker image
+  * Rely on EBS / instance store for disk space
+  * Relies on EC2 (can be managed by AWS)
+  
+
+## Amazon AppFlow
+* Fully managed integration service that enables you to securely transfer data between Software-as-a-Service (SaaS) applications and AWS
+* Sources: Salesforce, SAP, Zendesk, Slack, and ServiceNow
+* Destinations: AWS services like Amazon S3,Amazon Redshift or non- AWS such as SnowFlake and Salesforce
+* Frequency: on a schedule, in response to events, or on demand
+* Data transformation capabilities like filtering and validation
+* Encrypted over the public internet or privately over AWS PrivateLink
+* Don’t spend time writing the integrations and leverage APIs immediately
+
+
+# Extras
+## Resource Access Manager (RAM)
+* Share AWS resources with other AWS accounts to avoid resource duplication
+* Each participating account manage their own resources
+* Participating accounts can’t view, modify, delete resources that belong to other participants or the owner
+
+## VPC Sharing¶
+* Allows to share one or more subnets with other accounts within the same organization
+* Allows multiple accounts to create resources into shared and centrally-managed VPCs
+* Cannot share the whole VPC
+* Network is shared (high degree of interconnectivity)
+* every resource deployed in the subnet can talk to each other using private IP
+* security groups from other accounts can be referenced
+
+![](images/vpc_sharing.png)
+
+## Well Architected Framework
+  * Stop guessing your capacity needs (use auto-scaling)
+  * Test systems at production scale (for resiliency)
+  * Allow for evolutionary architectures
+  * Design based on changing requirements
+  * Drive architectures using data
+  * Load test your applications
+
+## Well Architected Pillars
+  * Operational Excellence
+  * Security
+  * Reliability
+  * Performance Efficiency
+  * Cost Optimization
+  * Sustainability
+
+## AWS Well Architected Tool
+  * Free tool to review your architectures against the 6 pillars framework and adopt architectural best practices
+  * How does it work?
+  * Select your workload and answer questions
+  * Review your answers against the 6 pillars
+  * Obtain advice: get videos and documentations, generate a report, see the results in a dashboard
