@@ -3356,7 +3356,13 @@ in an `S3 bucket`.
   * EFS / FSx (Lustre & Windows)
   * Storage Gateway (Volume Gateway)
 
-## Backup Vault
+### Backup Plans
+* Backup frequency (every 12 hours, daily, weekly, monthly, cron expression)
+* Backup window
+* Transition to Cold Storage (Never, Days,Weeks, Months,Years)
+* Retention Period (Always, Days,Weeks, Months,Years)
+
+### Backup Vault
 * WORM (Write Once Read Many) model for backups
 * Even the root user cannot delete backups
 * Additional layer of defense to protect your backups against:
