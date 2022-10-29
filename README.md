@@ -3398,6 +3398,9 @@ in an `S3 bucket`.
 
 ![](images/aws_vmware.png)
 
+# Machine Learning
+
+
 # Other Services
 ## Amazon Simple Email Service (Amazon SES)
 * Fully managed service to send emails securely, globally and at scale
@@ -3483,7 +3486,7 @@ in an `S3 bucket`.
 * Each participating account manage their own resources
 * Participating accounts can’t view, modify, delete resources that belong to other participants or the owner
 
-## VPC Sharing¶
+## VPC Sharing
 * Allows to share one or more subnets with other accounts within the same organization
 * Allows multiple accounts to create resources into shared and centrally-managed VPCs
 * Cannot share the whole VPC
