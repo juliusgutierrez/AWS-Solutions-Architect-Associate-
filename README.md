@@ -1,4 +1,4 @@
-# AWS-Solutions-Architect-Associate (C00-003)
+# AWS-Solutions-Architect-Associate (SSA-C03)
 ___
 # Computing
 
